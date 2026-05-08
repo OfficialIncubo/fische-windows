@@ -32,12 +32,10 @@ jobs:
         run: >
           cmake -B build 
           -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake 
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static 
-          -DVCPKG_HOST_TRIPLET=x64-windows-static
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Build
-        run: cmake --build build-nmake-static --config Release
-        shell: cmd
+        run: cmake --build build --config Release
 
       - name: Assemble artifact
         run: |
