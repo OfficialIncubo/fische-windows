@@ -21,12 +21,12 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 
 | Requirement | Minimum |
 |-------------|---------|
-| OS          | Windows 10 x64 or later |
-| GPU         | OpenGL 3.3 Core |
-| CPU         | x86-64 (SSE2) |
+| OS          | Windows 7 or later |
+| GPU         | OpenGL 3.2 Core |
+| CPU         | Any 64-bit processor (x64) |
 | Audio       | Any WASAPI-compatible output device |
 | RAM         | 128 MB |
-| Spout       | Optional — [Spout 2](https://spout.zeal.co/) for Spout output |
+| Spout       | Optional — [Spout](https://spout.zeal.co/) for sending visual renderer |
 
 ---
 
