@@ -1,0 +1,69 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v5
+        with:
+          path: C:\vcpkg\installed
+          key: vcpkg-x64-windows-static-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: vcpkg-x64-windows-static-
+
+      - name: Install vcpkg dependencies
+        run: |
+          C:\vcpkg\vcpkg.exe install glfw3:x64-windows-static glm:x64-windows-static
+        shell: cmd
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build-nmake-static ^
+            -G "NMake Makefiles" ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake ^
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static ^
+            -DVCPKG_MANIFEST_MODE=OFF
+        shell: cmd
+        env:
+          # Activate VS 2022 x64 environment (windows-latest ships VS 2022)
+          # If you have a self-hosted runner with VS 2026, adjust the path below.
+          VSCMD_ARG_TGT_ARCH: x64
+
+      - name: Build
+        run: cmake --build build-nmake-static --config Release
+        shell: cmd
+
+      - name: Assemble artifact
+        run: |
+          mkdir fische-windows-bin
+          copy build-nmake-static\fische.exe fische-windows-bin\
+          copy glfw3.dll fische-windows-bin\
+        shell: cmd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: fische-windows
+          path: fische-windows-bin\
+          if-no-files-found: error
+
+      # - name: Upload release asset (on tag)
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     files: fische-windows-bin\*
