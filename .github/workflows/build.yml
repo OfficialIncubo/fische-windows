@@ -39,17 +39,15 @@ jobs:
 
       - name: Assemble artifact
         run: |
-          mkdir fische-windows-bin
-          copy build-nmake-static\fische.exe fische-windows-bin\
-          copy glfw3.dll fische-windows-bin\
+          mkdir dist
+          copy build\Release\fische.exe dist\
         shell: cmd
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: fische-windows
-          path: fische-windows-bin\
-          if-no-files-found: error
+          name: fische-windows-x64
+          path: dist/
 
       # - name: Upload release asset (on tag)
       #   if: startsWith(github.ref, 'refs/tags/')
