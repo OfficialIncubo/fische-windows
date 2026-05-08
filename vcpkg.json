@@ -1,6 +1,6 @@
 {
-  "name": "fische-glfw3",
-  "version-string": "0.1.0",
+  "name": "fische-windows",
+  "version": "1.0.0",
   "dependencies": [
     "glfw3",
     "glm"

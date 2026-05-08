@@ -25,24 +25,15 @@ jobs:
           key: vcpkg-x64-windows-static-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           restore-keys: vcpkg-x64-windows-static-
 
-      - name: Install vcpkg dependencies
-        run: |
-          C:\vcpkg\vcpkg.exe install glfw3:x64-windows-static glm:x64-windows-static
-        shell: cmd
+      - name: Install dependencies via vcpkg
+        run: vcpkg install --triplet x64-windows-static
 
       - name: Configure CMake
-        run: |
-          cmake -S . -B build-nmake-static ^
-            -G "NMake Makefiles" ^
-            -DCMAKE_BUILD_TYPE=Release ^
-            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake ^
-            -DVCPKG_TARGET_TRIPLET=x64-windows-static ^
-            -DVCPKG_MANIFEST_MODE=OFF
-        shell: cmd
-        env:
-          # Activate VS 2022 x64 environment (windows-latest ships VS 2022)
-          # If you have a self-hosted runner with VS 2026, adjust the path below.
-          VSCMD_ARG_TGT_ARCH: x64
+        run: >
+          cmake -B build 
+          -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake 
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static 
+          -DVCPKG_HOST_TRIPLET=x64-windows-static
 
       - name: Build
         run: cmake --build build-nmake-static --config Release
