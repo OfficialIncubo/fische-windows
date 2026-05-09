@@ -82,7 +82,6 @@ WindowHeight=720
 | `UseFilePersistence` | true / false | Cache vector fields to `vectors/` folder |
 | `SpoutSenderEnabled` | true / false | Enable Spout texture sharing |
 | `VSync` | true / false | Enable VSync (`glfwSwapInterval`) |
-| `LockAspectRatio` | true / false | Letterbox the visualization to 4:3 |
 | `WindowWidth` / `WindowHeight` | integer | Last window size; restored on next launch |
 
 ---
