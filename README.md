@@ -9,11 +9,12 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers; no microphone or virtual cable required
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
 - 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app (OBS via Spout2Source, Resolume, MilkDrop, etc.)
-- ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, aspect ratio lock, Spout, and more; all saved to `settings.ini`
+- ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
 - 🖼️ **Fullscreen support** — toggle at any time with `F`
 - 🧠 **Nervous mode** — rapid-animation style toggle
 - ⏸️ **Pause / unpause**
 - 💾 **Vector file persistence** — optionally cache computed vector fields to `vectors/` for faster startup
+- 🎒 **Portable executable** — A bootstrapped .exe with settings UI, settings and vector loading/saving
 
 ---
 
