@@ -37,14 +37,9 @@ Output: `build-nmake-static\fische.exe`
 
 ## Distributing
 
-Copy these two files to the same folder:
+Copy ```fische.exe``` from build-nmake-static to any folder you want. 
 
-```
-fische.exe          (from build-nmake-static\)
-glfw3.dll           (from the project root)
-```
-
-No other runtime files are required. All other dependencies are linked statically.
+No other library and runtime files are required. All other dependencies are linked statically.
 
 ---
 
@@ -61,7 +56,7 @@ build-vs2026.cmd
 
 ## GitHub Actions
 
-A workflow file is provided at `.github/workflows/build.yml`. It builds automatically on every push and pull request to `main`, and produces a `fische-windows` artifact containing `fische.exe` and `glfw3.dll`.
+A workflow file is provided at `.github/workflows/build.yml`. It builds automatically on every push and pull request to `main`, and produces a `fische-windows` artifact containing `fische.exe`.
 
 To trigger a release build with a downloadable artifact, push a tag:
 
