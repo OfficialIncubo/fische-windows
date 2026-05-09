@@ -6,7 +6,7 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 
 ## Features
 
-- 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers; no microphone or virtual cable required
+- 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
 - 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.)
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
