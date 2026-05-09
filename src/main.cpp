@@ -25,6 +25,11 @@ WasapiCapture g_audioCapture;
 SpoutSender g_spout;
 bool g_helpVisible = false;
 GLuint g_fontBase = 0;
+HFONT g_font = nullptr;
+int g_fontCharWidth = 0;
+int g_fontCharHeight = 0;
+std::string g_osdMessage;
+std::chrono::steady_clock::time_point g_osdUntil;
 bool g_spoutReady = false;
 bool g_paused = false;
 bool g_openSettings = false;
@@ -35,6 +40,8 @@ int g_windowedWidth = 1280;
 int g_windowedHeight = 720;
 int g_lastFramebufferWidth = 0;
 int g_lastFramebufferHeight = 0;
+int g_osdTextW = 0;
+int g_osdTextH = 0;
 std::chrono::steady_clock::time_point g_lastResizeChange;
 std::chrono::steady_clock::time_point g_messageUntil;
 
@@ -83,6 +90,20 @@ void set_title_message(const std::string& message, int milliseconds = 1800)
 
   glfwSetWindowTitle(g_window, message.empty() ? "fische" : ("fische - " + message).c_str());
   g_messageUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds);
+}
+
+void show_osd(const std::string& message, int milliseconds = 1800)
+{
+  g_osdMessage = message;
+  g_osdUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds);
+
+  HDC hdc = wglGetCurrentDC();
+  HFONT old = (HFONT)SelectObject(hdc, g_font);
+  SIZE sz = {};
+  GetTextExtentPoint32A(hdc, message.c_str(), static_cast<int>(message.size()), &sz);
+  SelectObject(hdc, old);
+  g_osdTextW = sz.cx;
+  g_osdTextH = sz.cy;
 }
 
 void update_spout_state()
@@ -163,15 +184,20 @@ void init_gl_font()
   HDC hdc = wglGetCurrentDC();
   if (!hdc)
     return;
-  HFONT font = CreateFontW(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+  HFONT font = CreateFontW(28, 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE,
                            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                            CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                           DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+                           DEFAULT_PITCH | FF_DONTCARE, L"Times New Roman");
   HFONT old = (HFONT)SelectObject(hdc, font);
   g_fontBase = glGenLists(96);
   wglUseFontBitmapsW(hdc, 32, 96, g_fontBase);
+  SIZE sz = {};
+  GetTextExtentPoint32A(hdc, "M", 1, &sz);
+  g_fontCharWidth = sz.cx;
+  g_fontCharHeight = sz.cy;
   SelectObject(hdc, old);
-  DeleteObject(font);
+  g_font = font;
+  //DeleteObject(font);
 }
 
 void draw_help_screen(int fw, int fh)
@@ -220,7 +246,7 @@ void draw_help_screen(int fw, int fh)
   int y = 80;
   for (const char* line : lines)
   {
-    // glRasterPos2i fails silently if it lands outside the viewport   use 2f instead
+    // glRasterPos2i fails silently if it lands outside the viewport - use 2f instead
     glRasterPos2f(60.0f, static_cast<float>(y));
     glListBase(g_fontBase - 32);
     glCallLists(static_cast<GLsizei>(strlen(line)), GL_UNSIGNED_BYTE, line);
@@ -228,6 +254,62 @@ void draw_help_screen(int fw, int fh)
   }
 
   // Restore everything
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glPopAttrib();
+}
+
+void draw_osd(int fw, int fh)
+{
+  if (g_osdMessage.empty())
+    return;
+  if (std::chrono::steady_clock::now() >= g_osdUntil)
+  {
+    g_osdMessage.clear();
+    return;
+  }
+
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, fw, fh, 0, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  const int padX = 28;
+  const int padY = 16;
+  int boxW = g_osdTextW + padX * 2;
+  int boxH = g_osdTextH + padY * 2;
+  int boxX = (fw - boxW) / 2;
+  int boxY = fh - 80;
+
+  // Background
+  glColor4f(0.0f, 0.0f, 0.0f, 0.60f);
+  glBegin(GL_QUADS);
+    glVertex2i(boxX,        boxY);
+    glVertex2i(boxX + boxW, boxY);
+    glVertex2i(boxX + boxW, boxY + boxH);
+    glVertex2i(boxX,        boxY + boxH);
+  glEnd();
+
+  // Text centered inside the box
+  int textX = boxX + (boxW - g_osdTextW) / 2;
+  int textY = boxY + padY + g_osdTextH - 4;  // GL raster pos is baseline
+
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glRasterPos2f(static_cast<float>(textX), static_cast<float>(textY));
+  glListBase(g_fontBase - 32);
+  glCallLists(static_cast<GLsizei>(g_osdMessage.size()), GL_UNSIGNED_BYTE, g_osdMessage.c_str());
+
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
   glMatrixMode(GL_PROJECTION);
@@ -273,20 +355,20 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       if (g_visualizer)
         g_visualizer->SetNervousMode(g_settings.nervousMode);
       SaveSettings(g_settings);
-      set_title_message(g_settings.nervousMode ? "nervous mode on" : "nervous mode off");
+      show_osd(g_settings.nervousMode ? "Nervous mode on" : "Nervous mode off");
       break;
     case GLFW_KEY_O:
       g_openSettings = true;
       break;
     case GLFW_KEY_P:
       g_paused = !g_paused;
-      set_title_message(g_paused ? "paused" : "playing");
+      glfwSetWindowTitle(g_window, g_paused ? "fische - PAUSED" : "fische");
       break;
     case GLFW_KEY_Z:
       g_settings.spoutEnabled = !g_settings.spoutEnabled;
       update_spout_state();
       SaveSettings(g_settings);
-      set_title_message(g_settings.spoutEnabled ? "Spout output on" : "Spout output off");
+      show_osd(g_settings.spoutEnabled ? "Spout output on" : "Spout output off");
       break;
   }
 }
@@ -364,6 +446,7 @@ int main(int, char**)
   g_window = glfwCreateWindow(g_settings.windowWidth, g_settings.windowHeight, "fische", nullptr, nullptr);
   if (!g_window)
   {
+    if (g_font) { DeleteObject(g_font); g_font = nullptr; }
     glfwTerminate();
     return 1;
   }
@@ -373,6 +456,7 @@ int main(int, char**)
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
   {
+    if (g_font) { DeleteObject(g_font); g_font = nullptr; }
     glfwDestroyWindow(g_window);
     glfwTerminate();
     return 1;
@@ -403,22 +487,25 @@ int main(int, char**)
       });
     }
 
-    if (std::chrono::steady_clock::now() > g_messageUntil)
-      glfwSetWindowTitle(g_window, "fische");
+    // if (std::chrono::steady_clock::now() > g_messageUntil)
+    //   glfwSetWindowTitle(g_window, "fische");
 
     maybe_handle_resize();
 
     if (!g_paused && g_visualizer)
     {
+      int fw, fh;
+      glfwGetFramebufferSize(g_window, &fw, &fh);
+
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
       g_visualizer->Render();
+
       if (g_helpVisible)
-      {
-        int fw, fh;
-        glfwGetFramebufferSize(g_window, &fw, &fh);
         draw_help_screen(fw, fh);
-      }
+
+      draw_osd(fw, fh);
+
       glfwSwapBuffers(g_window);
     }
 
@@ -439,6 +526,7 @@ int main(int, char**)
     g_spoutReady = false;
   }
 
+  if (g_font) { DeleteObject(g_font); g_font = nullptr; }
   glfwDestroyWindow(g_window);
   glfwTerminate();
   return 0;
