@@ -45,6 +45,7 @@ On first run, `settings.ini` is created next to the executable with default sett
 | Key | Action |
 |-----|--------|
 | `Esc` | Exit |
+| `F1` | Show / hide help screen |
 | `F` | Toggle fullscreen |
 | `N` | Toggle nervous mode |
 | `O` | Open settings dialog |

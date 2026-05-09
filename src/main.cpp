@@ -23,6 +23,8 @@ AppSettings g_settings;
 std::unique_ptr<CFishBMC> g_visualizer;
 WasapiCapture g_audioCapture;
 SpoutSender g_spout;
+bool g_helpVisible = false;
+GLuint g_fontBase = 0;
 bool g_spoutReady = false;
 bool g_paused = false;
 bool g_openSettings = false;
@@ -156,6 +158,83 @@ void apply_settings(const AppSettings& settings)
   recreate_visualizer();
 }
 
+void init_gl_font()
+{
+  HDC hdc = wglGetCurrentDC();
+  if (!hdc)
+    return;
+  HFONT font = CreateFontW(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                           DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                           CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                           DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+  HFONT old = (HFONT)SelectObject(hdc, font);
+  g_fontBase = glGenLists(96);
+  wglUseFontBitmapsW(hdc, 32, 96, g_fontBase);
+  SelectObject(hdc, old);
+  DeleteObject(font);
+}
+
+void draw_help_screen(int fw, int fh)
+{
+  // Save all relevant GL state
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, fw, fh, 0, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+
+  // Disable anything that could interfere
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // Semi-transparent dark background
+  glColor4f(0.0f, 0.0f, 0.0f, 0.65f);
+  glBegin(GL_QUADS);
+    glVertex2i(0,  0);
+    glVertex2i(fw, 0);
+    glVertex2i(fw, fh);
+    glVertex2i(0,  fh);
+  glEnd();
+
+  // Text
+  const char* lines[] = {
+    "fische - Keyboard Shortcuts",
+    "",
+    "F1      Show / hide help screen",
+    "F       Toggle fullscreen",
+    "N       Toggle nervous mode",
+    "O       Open settings",
+    "P       Pause / unpause",
+    "Z       Toggle Spout output",
+    "Esc     Exit",
+  };
+
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  int y = 80;
+  for (const char* line : lines)
+  {
+    // glRasterPos2i fails silently if it lands outside the viewport   use 2f instead
+    glRasterPos2f(60.0f, static_cast<float>(y));
+    glListBase(g_fontBase - 32);
+    glCallLists(static_cast<GLsizei>(strlen(line)), GL_UNSIGNED_BYTE, line);
+    y += 28;
+  }
+
+  // Restore everything
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glPopAttrib();
+}
+
 void toggle_fullscreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -182,6 +261,9 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
   {
     case GLFW_KEY_ESCAPE:
       glfwSetWindowShouldClose(window, GLFW_TRUE);
+      break;
+    case GLFW_KEY_F1:
+      g_helpVisible = !g_helpVisible;
       break;
     case GLFW_KEY_F:
       toggle_fullscreen();
@@ -295,7 +377,8 @@ int main(int, char**)
     glfwTerminate();
     return 1;
   }
-
+  
+  init_gl_font();
   glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
 
   glEnable(GL_BLEND);
@@ -330,6 +413,12 @@ int main(int, char**)
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
       g_visualizer->Render();
+      if (g_helpVisible)
+      {
+        int fw, fh;
+        glfwGetFramebufferSize(g_window, &fw, &fh);
+        draw_help_screen(fw, fh);
+      }
       glfwSwapBuffers(g_window);
     }
 
