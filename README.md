@@ -33,10 +33,10 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 
 ## Running
 
-1. Copy `fische.exe` and `glfw3.dll` to the same folder.
+1. Copy `fische.exe` to any folder you want.
 2. Double-click `fische.exe`.
 
-On first run, `settings.ini` is created next to the executable with default settings. Audio capture starts automatically using the default output device.
+On the first run, `settings.ini` is created next to the executable with default settings. Audio capture starts automatically using the default output device.
 
 ---
 
