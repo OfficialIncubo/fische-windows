@@ -290,8 +290,8 @@ void draw_osd(int fw, int fh)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  const int padX = 28;
-  const int padY = 16;
+  const int padX = 20;
+  const int padY = 12;
   int boxW = g_osdTextW + padX * 2;
   int boxH = g_osdTextH + padY * 2;
   int boxX = (fw - boxW) / 2;
@@ -360,7 +360,7 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       if (g_visualizer)
         g_visualizer->SetNervousMode(g_settings.nervousMode);
       SaveSettings(g_settings);
-      show_osd(g_settings.nervousMode ? "Nervous mode on" : "Nervous mode off");
+      show_osd(g_settings.nervousMode ? "Nervous mode ON" : "Nervous mode OFF");
       break;
     case GLFW_KEY_O:
       g_openSettings = true;
@@ -373,13 +373,13 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       g_settings.spoutEnabled = !g_settings.spoutEnabled;
       update_spout_state();
       SaveSettings(g_settings);
-      show_osd(g_settings.spoutEnabled ? "Spout output on" : "Spout output off");
+      show_osd(g_settings.spoutEnabled ? "Spout output enabled" : "Spout output disabled");
       break;
     case GLFW_KEY_R:
       g_settings.audioSensitivity = 1.0f;
       g_audioCapture.SetSensitivity(1.0f);
       SaveSettings(g_settings);
-      show_osd("Audio Sensitivity reset to 1.00");
+      show_osd("Audio Sensitivity reset to 1");
       break;
     case GLFW_KEY_UP:
     case GLFW_KEY_DOWN:
