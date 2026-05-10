@@ -4,6 +4,28 @@ A Windows port of [fische](https://github.com/maysl/fische) — a real-time stan
 
 ---
 
+## Screenshots
+
+![fische visualization](screenshots/fischeWindowsScreenshot1.png)
+*fische for Windows — real-time audio visualization*
+
+![fische paused](screenshots/fischeWindowsScreenshot2.png)
+*Visual paused — title bar shows "fische - PAUSED"*
+
+![fische help screen](screenshots/fischeWindowsScreenshot3.png)
+*F1 help screen with keyboard/mouse shortcuts*
+
+![fische OSD](screenshots/fischeWindowsScreenshot4.png)
+*On-screen display for hotkey feedback*
+
+![fische settings dialog](screenshots/fischeWindowsScreenshot5.png)
+*Native Win32 settings dialog*
+
+![fische Spout output](screenshots/fischeWindowsScreenshot6.png)
+*Spout output received in Spout Receiver at 60 FPS*
+
+---
+
 ## Features
 
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
