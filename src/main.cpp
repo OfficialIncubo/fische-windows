@@ -484,7 +484,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int)
   }
   else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
   {
-    g_openSettings = true;
+    if (!g_openSettings)
+    {
+      g_openSettings = true;
+      std::thread([]() {
+        ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
+          g_pendingSettings = settings;
+          g_pendingApply = true;
+        });
+        g_openSettings = false;
+      }).detach();
+    }
   }
 }
 
