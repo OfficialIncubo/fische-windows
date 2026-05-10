@@ -423,6 +423,7 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       {
         g_openSettings = true;
         std::thread([]() {
+          glfwGetWindowSize(g_window, &g_settings.windowWidth, &g_settings.windowHeight);
           ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
             g_pendingSettings = settings;
             g_pendingApply = true;
@@ -488,6 +489,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int)
     {
       g_openSettings = true;
       std::thread([]() {
+        glfwGetWindowSize(g_window, &g_settings.windowWidth, &g_settings.windowHeight);
         ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
           g_pendingSettings = settings;
           g_pendingApply = true;
