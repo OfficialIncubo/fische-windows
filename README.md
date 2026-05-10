@@ -34,9 +34,7 @@ https://github.com/user-attachments/assets/cb9b4758-1ef1-41ae-8c46-65d9c1dda77a
 
 [Watch/Download for high-quality version](https://github.com/OfficialIncubo/fische-windows/raw/main/demo/fischeWindowsDemo.mp4)
 
-
-*fische → NestDrop via Spout*
-
+*fische → [NestDrop]((https://nestimmersion.ca/nestdrop.php)) via [Spout]((https://spout.zeal.co/))*
 https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 
 [Watch/Download for high-quality version](https://github.com/OfficialIncubo/fische-windows/raw/main/demo/fischeWindowstoNestDrop.mp4)
@@ -48,7 +46,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
 - 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 15.
-- 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.); sent as a DirectX 11 shared texture via Spout interop
+- 📡 **[Spout]((https://spout.zeal.co/)) output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.); sent as a DirectX 11 shared texture via Spout interop
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
 - 🖼️ **Fullscreen support** — toggle at any time with `F` or with `Double Left Click`
 - 🧠 **Nervous mode** — rapid-animation style toggle
@@ -60,7 +58,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 
 ## The story
 
-4 years ago (almost the end of August 2022), I've stumbled across FishBMC while playing some tunes on [Kodi](https://kodi.tv) using my phone (the old phone was Huawei P30 lite for me). A few days ago, I've decided to fully port this standalone visualization by the same name ([fische](https://github.com/maysl/fische)) to Windows, first thing I've tried to port is by using [ChatGPT Codex](chatgpt.com/codex/), but this one did a very great job on a first try. I've then refined and added some features using [Claude](https://claude.ai) and my own work, idea and inspiration. For me it looks like it's [MilkDrop](https://www.geisswerks.com/milkdrop/)-ish inspired UI in-render + a very much excitement of new additional features, Spout visual sending, functional hotkeys, settings dialog and so on. That's a story.
+4 years ago (almost the end of August 2022), I've stumbled across FishBMC while playing some tunes on [Kodi](https://kodi.tv) using my phone (the old phone was Huawei P30 lite for me). A few days ago, I've decided to fully port this standalone visualization by the same name ([fische](https://github.com/maysl/fische)) to Windows, first thing I've tried to port it by using [ChatGPT Codex](chatgpt.com/codex/), but this one did a very great job on a first try. I've then refined and added some features using [Claude](https://claude.ai) and my own work, idea and inspiration. For me it looks like it's [MilkDrop](https://www.geisswerks.com/milkdrop/)-ish inspired UI in-render + a very much excitement of new additional features, Spout visual sending, functional hotkeys, settings dialog and so on. That's a story.
 
 ---
 
