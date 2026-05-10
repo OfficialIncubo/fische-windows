@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: fische-windows-x64
+          name: fische-windows
           path: dist/
 
       # - name: Upload release asset (on tag)
