@@ -360,6 +360,11 @@ void toggle_fullscreen()
   else
   {
     glfwSetWindowMonitor(g_window, nullptr, g_windowedX, g_windowedY, g_windowedWidth, g_windowedHeight, 0);
+    if (g_settings.alwaysOnTop)
+    {
+      HWND hwnd = glfwGetWin32Window(g_window);
+      SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    }
   }
   if (!g_fullscreen)
   {
