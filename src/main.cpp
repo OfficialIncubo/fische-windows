@@ -34,6 +34,7 @@ bool g_spoutReady = false;
 bool g_paused = false;
 bool g_openSettings = false;
 bool g_fullscreen = false;
+bool g_alwaysOnTop = false;
 int g_windowedX = 100;
 int g_windowedY = 100;
 int g_windowedWidth = 1280;
@@ -238,6 +239,7 @@ void draw_help_screen(int fw, int fh)
     "Esc     Exit",
     "F1      Show / hide help screen",
     "F       Toggle fullscreen",
+    "T       Toggle always on top",
     "N       Toggle nervous mode",
     "O       Open settings",
     "P       Pause / unpause",
@@ -339,6 +341,16 @@ void toggle_fullscreen()
   }
 }
 
+void set_always_on_top(bool enabled)
+{
+  g_alwaysOnTop = enabled;
+  g_settings.alwaysOnTop = enabled;
+  HWND hwnd = glfwGetWin32Window(g_window);
+  SetWindowPos(hwnd, enabled ? HWND_TOPMOST : HWND_NOTOPMOST,
+               0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+  SaveSettings(g_settings);
+}
+
 void key_callback(GLFWwindow* window, int key, int, int action, int)
 {
   if (action != GLFW_PRESS)
@@ -354,6 +366,10 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       break;
     case GLFW_KEY_F:
       toggle_fullscreen();
+      break;
+    case GLFW_KEY_T:
+      set_always_on_top(!g_alwaysOnTop);
+      show_osd(g_alwaysOnTop ? "Always on top ON" : "Always on top OFF");
       break;
     case GLFW_KEY_N:
       g_settings.nervousMode = !g_settings.nervousMode;
@@ -488,6 +504,9 @@ int main(int, char**)
     SendMessageW(hwnd, WM_SETICON, ICON_BIG,   (LPARAM)icon);
     SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
   }
+
+  if (g_settings.alwaysOnTop)
+    set_always_on_top(true);
 
   glfwMakeContextCurrent(g_window);
   glfwSetKeyCallback(g_window, key_callback);

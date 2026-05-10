@@ -10,7 +10,7 @@
 namespace
 {
 constexpr int kDialogWidth = 460;
-constexpr int kDialogHeight = 376;
+constexpr int kDialogHeight = 404;
 constexpr int kMargin = 20;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
@@ -29,6 +29,7 @@ constexpr int kVSyncCheck = 1009;
 constexpr int kSensitivitySlider = 1010;
 constexpr int kSensitivityLabel = 1011;
 constexpr int kSensitivityReset = 1012;
+constexpr int kAlwaysOnTopCheck = 1013;
 
 struct DialogState
 {
@@ -116,6 +117,7 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   state->working.useFilePersistence = SendMessageW(GetDlgItem(hwnd, kPersistenceCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.spoutEnabled = SendMessageW(GetDlgItem(hwnd, kSpoutCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.vsyncEnabled = SendMessageW(GetDlgItem(hwnd, kVSyncCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
+  state->working.alwaysOnTop = SendMessageW(GetDlgItem(hwnd, kAlwaysOnTopCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
 
   *state->settings = state->working;
   SaveSettings(*state->settings);
@@ -198,6 +200,11 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       HWND vsync = create_control(hwnd, L"BUTTON", L"Enable VSync", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
                                   kVSyncCheck);
       SendMessageW(vsync, BM_SETCHECK, state->working.vsyncEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
+      y += 28;
+
+      HWND alwaysOnTop = create_control(hwnd, L"BUTTON", L"Always on top", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
+                                        kAlwaysOnTopCheck);
+      SendMessageW(alwaysOnTop, BM_SETCHECK, state->working.alwaysOnTop ? BST_CHECKED : BST_UNCHECKED, 0);
 
       create_control(hwnd, L"BUTTON", L"OK", BS_DEFPUSHBUTTON, kDialogWidth - 252, kDialogHeight - 78, 70, 28, IDOK);
       create_control(hwnd, L"BUTTON", L"Apply", 0, kDialogWidth - 172, kDialogHeight - 78, 70, 28, kApplyButton);

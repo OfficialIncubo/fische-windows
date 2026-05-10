@@ -48,6 +48,7 @@ On the first run, `settings.ini` is created next to the executable with default 
 | `Esc` | Exit |
 | `F1` | Show / hide help screen |
 | `F` | Toggle fullscreen |
+| `T` | Toggle always on top |
 | `N` | Toggle nervous mode |
 | `O` | Open settings dialog |
 | `P` | Pause / unpause |
@@ -73,6 +74,7 @@ NervousMode=false
 UseFilePersistence=false
 SpoutSenderEnabled=false
 VSync=false
+AlwaysOnTop=false
 WindowWidth=1280
 WindowHeight=720
 ```
@@ -87,6 +89,7 @@ WindowHeight=720
 | `UseFilePersistence` | true / false | Cache vector fields to `vectors/` folder |
 | `SpoutSenderEnabled` | true / false | Enable Spout texture sharing |
 | `VSync` | true / false | Enable VSync (`glfwSwapInterval`) |
+| `AlwaysOnTop` | true / false | Keep the visual window above all other windows |
 | `WindowWidth` / `WindowHeight` | integer | Last window size; restored on next launch |
 
 ---

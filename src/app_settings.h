@@ -8,6 +8,7 @@ struct AppSettings
   std::string audioDevice;
   int quality = 2;
   int fpsLimit = 60;
+  bool alwaysOnTop = false;
   bool nervousMode = false;
   bool useFilePersistence = false;
   bool spoutEnabled = false;

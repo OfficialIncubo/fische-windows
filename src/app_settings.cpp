@@ -145,6 +145,8 @@ AppSettings LoadSettings()
     settings.spoutEnabled = parse_bool(it->second, settings.spoutEnabled);
   if (auto it = values.find("vsync"); it != values.end())
     settings.vsyncEnabled = parse_bool(it->second, settings.vsyncEnabled);
+  if (auto it = values.find("alwaysontop"); it != values.end())
+    settings.alwaysOnTop = parse_bool(it->second, settings.alwaysOnTop);
   if (auto it = values.find("windowwidth"); it != values.end())
     settings.windowWidth = parse_int(it->second, settings.windowWidth, 320, 7680);
   if (auto it = values.find("windowheight"); it != values.end())
@@ -169,6 +171,7 @@ void SaveSettings(const AppSettings& settings)
   file << "UseFilePersistence=" << (settings.useFilePersistence ? "true" : "false") << "\n";
   file << "SpoutSenderEnabled=" << (settings.spoutEnabled ? "true" : "false") << "\n";
   file << "VSync=" << (settings.vsyncEnabled ? "true" : "false") << "\n";
+  file << "AlwaysOnTop=" << (settings.alwaysOnTop ? "true" : "false") << "\n";
   file << "WindowWidth=" << std::max(settings.windowWidth, 320) << "\n";
   file << "WindowHeight=" << std::max(settings.windowHeight, 240) << "\n";
 }
