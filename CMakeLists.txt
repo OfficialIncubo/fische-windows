@@ -19,6 +19,8 @@ if(NOT glm_FOUND)
     REQUIRED)
 endif()
 
+set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/fische.rc")
+
 add_executable(fische
   src/analyst.cpp
   src/audiobuffer.cpp
@@ -45,7 +47,8 @@ add_executable(fische
   src/spout/SpoutSenderNames.cpp
   src/spout/SpoutSharedMemory.cpp
   src/spout/SpoutReceiver.cpp
-  src/spout/SpoutCopy.cpp)
+  src/spout/SpoutCopy.cpp
+  ${RESOURCE_FILE})
 
 target_include_directories(fische PRIVATE
   ${PROJECT_SOURCE_DIR}/src

@@ -478,6 +478,17 @@ int main(int, char**)
     return 1;
   }
 
+  HWND hwnd = glfwGetWin32Window(g_window);
+  HICON icon = (HICON)LoadImageW(GetModuleHandleW(nullptr),
+                                MAKEINTRESOURCEW(1),
+                                IMAGE_ICON, 0, 0,
+                                LR_DEFAULTSIZE | LR_SHARED);
+  if (icon)
+  {
+    SendMessageW(hwnd, WM_SETICON, ICON_BIG,   (LPARAM)icon);
+    SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+  }
+
   glfwMakeContextCurrent(g_window);
   glfwSetKeyCallback(g_window, key_callback);
 
