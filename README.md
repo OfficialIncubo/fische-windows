@@ -1,6 +1,6 @@
 # fische for Windows
 
-A Windows port of [fische](https://github.com/maysl/fische) — a standalone real-time music visualizer with WASAPI loopback audio capture, [Spout](https://spout.zeal.co/) output, GLFW/OpenGL rendering, and a native settings dialog.
+A Windows port of [fische](https://github.com/maysl/fische) — a real-time standalone music visualizer originally built for Linux. This port brings fische to Windows with native WASAPI loopback audio capture, [Spout](https://spout.zeal.co/) texture sharing for sending the visualization to other apps, OpenGL rendering via GLFW, adjustable audio sensitivity, VSync and FPS control, always-on-top, fullscreen, and a native Win32 settings dialog — all packed into a single portable executable.
 
 ---
 
