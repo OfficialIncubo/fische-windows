@@ -11,7 +11,7 @@ namespace
 {
 constexpr int kDialogWidth = 460;
 constexpr int kDialogHeight = 404;
-constexpr int kMargin = 20;
+constexpr int kMargin = 10;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
 constexpr int kControlWidth = 270;
