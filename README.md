@@ -83,8 +83,8 @@ WindowHeight=720
 |-----|------|-------------|
 | `Audio` | string | Friendly name of the audio device; empty/no name match = system default output |
 | `AudioSensitivity` | 0-15 | Multiplier applied to audio input before visualization; 1 = no change |
-| `Detail` | Low / Normal / High / Extreme | Visual detail level (also written as `Quality` 0–3) |
-| `FPSLimit` | 0–240 | Target frame rate; 0 = unlimited |
+| `Detail` | Low / Normal / High / Extreme | Visual detail level (also written as `Quality` 0-3) |
+| `FPSLimit` | 0-240 | Target frame rate; 0 = unlimited |
 | `NervousMode` | true / false | Rapid animation mode |
 | `UseFilePersistence` | true / false | Cache vector fields to `vectors/` folder |
 | `SpoutSenderEnabled` | true / false | Enable Spout texture sharing |
