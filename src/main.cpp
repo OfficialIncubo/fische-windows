@@ -201,6 +201,8 @@ void apply_settings(const AppSettings& settings)
     g_visualizer->SetNervousMode(g_settings.nervousMode);
   glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
   g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
+  if (!g_fullscreen)
+    glfwSetWindowSize(g_window, g_settings.windowWidth, g_settings.windowHeight);
   recreate_visualizer();
 }
 

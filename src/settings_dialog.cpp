@@ -10,7 +10,7 @@
 namespace
 {
 constexpr int kDialogWidth = 460;
-constexpr int kDialogHeight = 404;
+constexpr int kDialogHeight = 432;
 constexpr int kMargin = 10;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
@@ -30,6 +30,8 @@ constexpr int kSensitivitySlider = 1010;
 constexpr int kSensitivityLabel = 1011;
 constexpr int kSensitivityReset = 1012;
 constexpr int kAlwaysOnTopCheck = 1013;
+constexpr int kWidthEdit  = 1014;
+constexpr int kHeightEdit = 1015;
 
 struct DialogState
 {
@@ -111,6 +113,12 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   HWND quality = GetDlgItem(hwnd, kQualityCombo);
   state->working.quality = std::clamp(static_cast<int>(SendMessageW(quality, CB_GETCURSEL, 0, 0)), 0, 3);
 
+  wchar_t buf[32];
+  GetWindowTextW(GetDlgItem(hwnd, kWidthEdit),  buf, 32);
+  state->working.windowWidth = std::clamp(_wtoi(buf), 320, 7680);
+  GetWindowTextW(GetDlgItem(hwnd, kHeightEdit), buf, 32);
+  state->working.windowHeight = std::clamp(_wtoi(buf), 240, 4320);
+
   HWND fps = GetDlgItem(hwnd, kFpsSlider);
   state->working.fpsLimit = std::clamp(static_cast<int>(SendMessageW(fps, TBM_GETPOS, 0, 0)), 0, 240);
   state->working.nervousMode = SendMessageW(GetDlgItem(hwnd, kNervousCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
@@ -171,6 +179,15 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       SendMessageW(qualityCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"High"));
       SendMessageW(qualityCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Extreme"));
       SendMessageW(qualityCombo, CB_SETCURSEL, std::clamp(state->working.quality, 0, 3), 0);
+      y += kRowHeight + 4;
+
+      create_control(hwnd, L"STATIC", L"Window size", 0, kMargin, y + 4, kLabelWidth, 22, 0);
+      HWND widthEdit = create_control(hwnd, L"EDIT", L"", ES_NUMBER | WS_BORDER, kControlLeft, y, 70, 22, kWidthEdit);
+      create_control(hwnd, L"STATIC", L"\u00D7", 0, kControlLeft + 76, y + 4, 12, 22, 0);
+      HWND heightEdit = create_control(hwnd, L"EDIT", L"", ES_NUMBER | WS_BORDER, kControlLeft + 94, y, 70, 22, kHeightEdit);
+
+      SetWindowTextW(widthEdit,  std::to_wstring(state->working.windowWidth).c_str());
+      SetWindowTextW(heightEdit, std::to_wstring(state->working.windowHeight).c_str());
       y += kRowHeight + 4;
 
       create_control(hwnd, L"STATIC", L"Speed", 0, kMargin, y + 4, kLabelWidth, 22, 0);
