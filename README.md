@@ -115,7 +115,7 @@ GNU General Public License v2.0 or later.
 | Project | Author |
 |---------|--------|
 | [fische](https://github.com/maysl/fische) | Marcel Ebmer ([maysl](https://github.com/maysl)) |
-| [visualization.fishbmc](https://github.com/xbmc/visualization.fishbmc) | Team Kodi |
+| [visualization.fishbmc](https://github.com/xbmc/visualization.fishbmc) ([alternative (OLD)](https://github.com/maysl/fishbmc)) | Team Kodi |
 | [GLFW](https://www.glfw.org/) | Camilla Löwy and contributors |
 | [Spout](https://spout.zeal.co) | Lynn Jarvis ([leadedge](https://github.com/leadedge)) |
 | [BeatDrop loopback capture](https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/tree/master/audio) | Matthew van Eerde & Incubo_ |
