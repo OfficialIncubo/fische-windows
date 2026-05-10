@@ -20,6 +20,8 @@ namespace
 {
 GLFWwindow* g_window = nullptr;
 AppSettings g_settings;
+bool g_pendingApply = false;
+AppSettings g_pendingSettings;
 std::unique_ptr<CFishBMC> g_visualizer;
 WasapiCapture g_audioCapture;
 SpoutSender g_spout;
@@ -417,7 +419,17 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       show_osd(g_settings.nervousMode ? "Nervous mode ON" : "Nervous mode OFF");
       break;
     case GLFW_KEY_O:
-      g_openSettings = true;
+      if (!g_openSettings)
+      {
+        g_openSettings = true;
+        std::thread([]() {
+          ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
+            g_pendingSettings = settings;
+            g_pendingApply = true;
+          });
+          g_openSettings = false;
+        }).detach();
+      }
       break;
     case GLFW_KEY_P:
       g_paused = !g_paused;
@@ -608,16 +620,22 @@ int main(int, char**)
   {
     auto frameStart = std::chrono::steady_clock::now();
 
-    if (g_openSettings)
-    {
-      g_openSettings = false;
-      ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
-        apply_settings(settings);
-      });
-    }
+    // if (g_openSettings)
+    // {
+    //   g_openSettings = false;
+    //   ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
+    //     apply_settings(settings);
+    //   });
+    // }
 
     // if (std::chrono::steady_clock::now() > g_messageUntil)
     //   glfwSetWindowTitle(g_window, "fische");
+
+    if (g_pendingApply)
+    {
+      g_pendingApply = false;
+      apply_settings(g_pendingSettings);
+    }
 
     maybe_handle_resize();
 
