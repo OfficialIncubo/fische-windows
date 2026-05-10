@@ -8,7 +8,7 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
-- 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 10.
+- 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 15.
 - 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.)
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
 - 🖼️ **Fullscreen support** — toggle at any time with `F`
@@ -80,7 +80,7 @@ WindowHeight=720
 | Key | Type | Description |
 |-----|------|-------------|
 | `Audio` | string | Friendly name of the audio device; empty/no name match = system default output |
-| `AudioSensitivity` | 0-10 | Multiplier applied to audio input before visualization; 1 = no change |
+| `AudioSensitivity` | 0-15 | Multiplier applied to audio input before visualization; 1 = no change |
 | `Detail` | Low / Normal / High / Extreme | Visual detail level (also written as `Quality` 0–3) |
 | `FPSLimit` | 0–240 | Target frame rate; 0 = unlimited |
 | `NervousMode` | true / false | Rapid animation mode |

@@ -128,7 +128,7 @@ AppSettings LoadSettings()
   if (auto it = values.find("audio"); it != values.end())
     settings.audioDevice = it->second;
   if (auto it = values.find("audiosensitivity"); it != values.end())
-    settings.audioSensitivity = std::clamp(std::stof(trim(it->second)), 0.0f, 10.0f);
+    settings.audioSensitivity = std::clamp(std::stof(trim(it->second)), 0.0f, 15.0f);
   if (auto it = values.find("detail"); it != values.end())
     settings.quality = parse_quality(it->second, settings.quality);
   if (auto it = values.find("quality"); it != values.end())

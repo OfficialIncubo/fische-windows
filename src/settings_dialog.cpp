@@ -149,8 +149,8 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       create_control(hwnd, L"STATIC", L"A. Sensitivity", 0, kMargin, y + 4, kLabelWidth, 22, 0);
       HWND sensSlider = create_control(hwnd, TRACKBAR_CLASSW, L"", TBS_AUTOTICKS,
                                       kControlLeft, y, 160, 28, kSensitivitySlider);
-      // 0-1000 range maps to 0.00-10.00
-      SendMessageW(sensSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1000));
+      // 0-1500 range maps to 0-15
+      SendMessageW(sensSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1500));
       SendMessageW(sensSlider, TBM_SETTICFREQ, 100, 0);
       SendMessageW(sensSlider, TBM_SETPOS, TRUE,
                   static_cast<LPARAM>(state->working.audioSensitivity * 100.0f));

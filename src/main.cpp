@@ -389,7 +389,7 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
                   ? 0.1f : 0.01f;
       s += (key == GLFW_KEY_UP ? step : -step);
       s = std::round(s * 100.0f) / 100.0f;  // always 2 decimal places
-      s = std::clamp(s, 0.0f, 10.0f);
+      s = std::clamp(s, 0.0f, 15.0f);
       g_audioCapture.SetSensitivity(s);
       SaveSettings(g_settings);
       char buf[32];
