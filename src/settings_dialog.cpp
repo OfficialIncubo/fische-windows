@@ -256,12 +256,15 @@ bool ShowSettingsDialog(HWND owner, AppSettings& settings, const std::function<v
   state.devices = EnumerateAudioDevices();
 
   WNDCLASSW wc{};
+  wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.lpfnWndProc = dialog_proc;
   wc.hInstance = GetModuleHandleW(nullptr);
   wc.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
   wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
   wc.lpszClassName = L"FischeSettingsDialog";
-  RegisterClassW(&wc);
+  WNDCLASSW existing{};
+  if (!GetClassInfoW(GetModuleHandleW(nullptr), wc.lpszClassName, &existing))
+    RegisterClassW(&wc);
 
   RECT ownerRect{};
   if (owner && GetWindowRect(owner, &ownerRect))
@@ -275,11 +278,13 @@ bool ShowSettingsDialog(HWND owner, AppSettings& settings, const std::function<v
   int x = ownerRect.left + ((ownerRect.right - ownerRect.left) - kDialogWidth) / 2;
   int y = ownerRect.top + ((ownerRect.bottom - ownerRect.top) - kDialogHeight) / 2;
 
-  HWND hwnd = CreateWindowExW(WS_EX_DLGMODALFRAME, wc.lpszClassName, L"Fische Settings",
+  HWND hwnd = CreateWindowExW(WS_EX_DLGMODALFRAME | WS_EX_APPWINDOW, wc.lpszClassName, L"fische Settings",
                               WS_CAPTION | WS_SYSMENU | WS_POPUP, x, y, kDialogWidth, kDialogHeight,
                               owner, nullptr, wc.hInstance, &state);
   if (!hwnd)
     return false;
+
+  SetWindowTextW(hwnd, L"fische Settings");
 
   if (owner)
     EnableWindow(owner, FALSE);
