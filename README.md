@@ -11,7 +11,7 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 - 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 15.
 - 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.)
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
-- 🖼️ **Fullscreen support** — toggle at any time with `F`
+- 🖼️ **Fullscreen support** — toggle at any time with `F` or with `Double Left Click`
 - 🧠 **Nervous mode** — rapid-animation style toggle
 - ⏸️ **Pause / unpause**
 - 💾 **Vector file persistence** — optionally cache computed vector fields to `vectors/` for faster startup
@@ -47,10 +47,10 @@ On the first run, `settings.ini` is created next to the executable with default 
 |-----|--------|
 | `Esc` | Exit |
 | `F1` | Show / hide help screen |
-| `F` | Toggle fullscreen |
+| `F` (or `Double Left Click`) | Toggle fullscreen |
 | `T` | Toggle always on top |
 | `N` | Toggle nervous mode |
-| `O` | Open settings dialog |
+| `O` (or `Right Click`) | Open settings dialog |
 | `P` | Pause / unpause |
 | `Z` | Toggle Spout output |
 | `R` | Reset audio sensitivity |

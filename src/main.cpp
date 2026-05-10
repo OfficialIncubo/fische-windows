@@ -234,19 +234,19 @@ void draw_help_screen(int fw, int fh)
 
   // Text
   const char* lines[] = {
-    "Help - Hotkeys/Keyboard Shortcuts",
+    "Help - Keyboard/Mouse Shortcuts",
     "",
-    "Esc     Exit",
-    "F1      Show / hide help screen",
-    "F       Toggle fullscreen",
-    "T       Toggle always on top",
-    "N       Toggle nervous mode",
-    "O       Open settings",
-    "P       Pause / unpause",
-    "Z       Toggle Spout output",
-    "R       Reset audio sensitivity",
-    "Up      Increase audio sensitivity",
-    "Down    Decrease audio sensitivity",
+    "Esc            Exit",
+    "F1/DLClick     Show / hide help screen",
+    "F              Toggle fullscreen",
+    "T              Toggle always on top",
+    "N              Toggle nervous mode",
+    "O/RClick       Open settings",
+    "P              Pause / unpause",
+    "Z              Toggle Spout output",
+    "R              Reset audio sensitivity",
+    "Up             Increase audio sensitivity",
+    "Down           Decrease audio sensitivity",
   };
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -416,6 +416,28 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
   }
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int)
+{
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+  {
+    static auto lastClick = std::chrono::steady_clock::time_point{};
+    auto now = std::chrono::steady_clock::now();
+    if (now - lastClick < std::chrono::milliseconds(400))
+    {
+      toggle_fullscreen();
+      lastClick = {};
+    }
+    else
+    {
+      lastClick = now;
+    }
+  }
+  else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+  {
+    g_openSettings = true;
+  }
+}
+
 void maybe_handle_resize()
 {
   int framebufferWidth = 0;
@@ -510,6 +532,8 @@ int main(int, char**)
 
   glfwMakeContextCurrent(g_window);
   glfwSetKeyCallback(g_window, key_callback);
+  glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
   {
