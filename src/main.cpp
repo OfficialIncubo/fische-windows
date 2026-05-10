@@ -30,6 +30,8 @@ int g_fontCharWidth = 0;
 int g_fontCharHeight = 0;
 std::string g_osdMessage;
 std::chrono::steady_clock::time_point g_osdUntil;
+std::chrono::steady_clock::time_point g_cursorUntil;
+bool g_cursorVisible = true;
 bool g_spoutReady = false;
 bool g_paused = false;
 bool g_openSettings = false;
@@ -170,6 +172,26 @@ void recreate_visualizer()
   update_spout_state();
   g_lastFramebufferWidth = framebufferWidth;
   g_lastFramebufferHeight = framebufferHeight;
+}
+
+void refresh_cursor_visibility()
+{
+  if (!g_fullscreen)
+  {
+    if (!g_cursorVisible)
+    {
+      glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      g_cursorVisible = true;
+    }
+    return;
+  }
+
+  auto now = std::chrono::steady_clock::now();
+  if (g_cursorVisible && now >= g_cursorUntil)
+  {
+    glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    g_cursorVisible = false;
+  }
 }
 
 void apply_settings(const AppSettings& settings)
@@ -339,6 +361,15 @@ void toggle_fullscreen()
   {
     glfwSetWindowMonitor(g_window, nullptr, g_windowedX, g_windowedY, g_windowedWidth, g_windowedHeight, 0);
   }
+  if (!g_fullscreen)
+  {
+    glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    g_cursorVisible = true;
+  }
+  else
+  {
+    g_cursorUntil = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+  }
 }
 
 void set_always_on_top(bool enabled)
@@ -438,6 +469,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int)
   }
 }
 
+void cursor_pos_callback(GLFWwindow*, double, double)
+{
+  if (!g_fullscreen)
+    return;
+  glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  g_cursorVisible = true;
+  g_cursorUntil = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+}
+
 void maybe_handle_resize()
 {
   int framebufferWidth = 0;
@@ -533,6 +573,7 @@ int main(int, char**)
   glfwMakeContextCurrent(g_window);
   glfwSetKeyCallback(g_window, key_callback);
   glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+  glfwSetCursorPosCallback(g_window, cursor_pos_callback);
 
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -591,6 +632,7 @@ int main(int, char**)
     }
 
     glfwPollEvents();
+    refresh_cursor_visibility();
     enforce_frame_limit(frameStart);
   }
   
