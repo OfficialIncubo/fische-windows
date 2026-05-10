@@ -233,7 +233,7 @@ void draw_help_screen(int fw, int fh)
 
   // Text
   const char* lines[] = {
-    "fische - Keyboard Shortcuts",
+    "Help - Hotkeys/Keyboard Shortcuts",
     "",
     "Esc     Exit",
     "F1      Show / hide help screen",
