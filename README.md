@@ -6,25 +6,33 @@ A Windows port of [fische](https://github.com/maysl/fische) — a real-time stan
 
 ## Screenshots
 
-![fische visualization](screenshots/fischeWindowsScreenshot1.png)
 *fische for Windows — real-time audio visualization*
+![fische visualization](screenshots/fischeWindowsScreenshot1.png)
 
-![fische paused](screenshots/fischeWindowsScreenshot2.png)
 *Visual paused — title bar shows "fische - PAUSED"*
+![fische paused](screenshots/fischeWindowsScreenshot2.png)
 
-![fische help screen](screenshots/fischeWindowsScreenshot3.png)
 *F1 help screen with keyboard/mouse shortcuts*
+![fische help screen](screenshots/fischeWindowsScreenshot3.png)
 
-![fische OSD](screenshots/fischeWindowsScreenshot4.png)
 *On-screen display for hotkey feedback*
+![fische OSD](screenshots/fischeWindowsScreenshot4.png)
 
-![fische settings dialog](screenshots/fischeWindowsScreenshot5.png)
 *Native Win32 settings dialog*
+![fische settings dialog](screenshots/fischeWindowsScreenshot5.png)
 
-![fische Spout output](screenshots/fischeWindowsScreenshot6.png)
 *Spout output received in Spout Receiver at 60 FPS*
+![fische Spout output](screenshots/fischeWindowsScreenshot6.png)
 
 ---
+
+## Video demos
+
+*fische for Windows Demo*
+https://github.com/yourusername/fische-windows/raw/main/demo/fischeWindowsDemo.mp4
+
+*fische → NestDrop via Spout*
+https://github.com/yourusername/fische-windows/raw/main/demo/fischeWindowstoNestDrop.mp4
 
 ## Features
 
@@ -38,6 +46,12 @@ A Windows port of [fische](https://github.com/maysl/fische) — a real-time stan
 - ⏸️ **Pause / unpause**
 - 💾 **Vector file persistence** — optionally cache computed vector fields to `vectors/` for faster startup
 - 🎒 **100% Portable** — A bootstrapped .exe with settings UI, settings and vector loading/saving and lots of functionalities
+
+---
+
+## The story
+
+4 years ago (almost the end of August 2022), I've stumbled across FishBMC while playing some tunes on [Kodi](https://kodi.tv) using my phone (the old phone was Huawei P30 lite for me). A few days ago, I've decided to fully port this standalone visualization by the same name ([fische](https://github.com/maysl/fische)) to Windows, first thing I've tried to port is by using [ChatGPT Codex](chatgpt.com/codex/), but this one did a very great job on a first try. I've then refined and added some features using [Claude](https://claude.ai) and my own work, idea and inspiration. For me it looks like it's [MilkDrop](https://www.geisswerks.com/milkdrop/)-ish inspired UI in-render + a very much excitement of new additional features, Spout visual sending, functional hotkeys, settings dialog and so on. That's a story.
 
 ---
 
@@ -126,7 +140,7 @@ See [Build Instructions.md](Build%20Instructions.md).
 
 GNU General Public License v2.0 or later.
 
-- Original fische engine: © 2012 Marcel Ebmer ([@maysl](https://github.com/maysl)), © 2005–2022 Team Kodi
+- Original fische engine: © 2013 Marcel Ebmer ([@maysl](https://github.com/maysl)), © 2005–2026 Team Kodi; The Kodi Foundation
 - Spout: © Lynn Jarvis ([@leadedge](https://github.com/leadedge)) — BSD-style
 - Windows port and integration: see `LICENSE.md`
 
@@ -137,7 +151,7 @@ GNU General Public License v2.0 or later.
 | Project | Author |
 |---------|--------|
 | [fische](https://github.com/maysl/fische) | Marcel Ebmer ([maysl](https://github.com/maysl)) |
-| [visualization.fishbmc](https://github.com/xbmc/visualization.fishbmc) ([alternative (OLD)](https://github.com/maysl/fishbmc)) | Team Kodi |
+| [visualization.fishbmc](https://github.com/xbmc/visualization.fishbmc) ([alternative (OLD)](https://github.com/maysl/fishbmc)) | Team Kodi; The Kodi Foundation |
 | [GLFW](https://www.glfw.org/) | Camilla Löwy and contributors |
 | [Spout](https://spout.zeal.co) | Lynn Jarvis ([leadedge](https://github.com/leadedge)) |
 | [BeatDrop loopback capture](https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/tree/master/audio) | Matthew van Eerde & Incubo_ |
