@@ -10,8 +10,8 @@
 namespace
 {
 constexpr int kDialogWidth = 460;
-constexpr int kDialogHeight = 348;
-constexpr int kMargin = 18;
+constexpr int kDialogHeight = 376;
+constexpr int kMargin = 20;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
 constexpr int kControlWidth = 270;
@@ -26,6 +26,9 @@ constexpr int kPersistenceCheck = 1006;
 constexpr int kSpoutCheck = 1007;
 constexpr int kApplyButton = 1008;
 constexpr int kVSyncCheck = 1009;
+constexpr int kSensitivitySlider = 1010;
+constexpr int kSensitivityLabel = 1011;
+constexpr int kSensitivityReset = 1012;
 
 struct DialogState
 {
@@ -34,6 +37,7 @@ struct DialogState
   std::function<void(const AppSettings&)> onApply;
   std::vector<AudioDeviceInfo> devices;
   HWND fpsLabel = nullptr;
+  HWND sensLabel = nullptr;
   bool accepted = false;
 };
 
@@ -56,6 +60,15 @@ void update_fps_label(DialogState* state, HWND slider)
   int value = static_cast<int>(SendMessageW(slider, TBM_GETPOS, 0, 0));
   std::wstring text = value == 0 ? L"Unlimited" : std::to_wstring(value) + L" FPS";
   SetWindowTextW(state->fpsLabel, text.c_str());
+}
+
+void update_sens_label(DialogState* state, HWND slider)
+{
+  int value = static_cast<int>(SendMessageW(slider, TBM_GETPOS, 0, 0));
+  float sens = value / 100.0f;
+  wchar_t buf[32];
+  swprintf_s(buf, L"%.2f", sens);
+  SetWindowTextW(state->sensLabel, buf);
 }
 
 void populate_audio_combo(HWND combo, DialogState* state)
@@ -90,6 +103,9 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
     state->working.audioDevice = WideToUtf8(state->devices[static_cast<size_t>(data)].name);
   else
     state->working.audioDevice.clear();
+
+  HWND sens = GetDlgItem(hwnd, kSensitivitySlider);
+  state->working.audioSensitivity = static_cast<float>(SendMessageW(sens, TBM_GETPOS, 0, 0)) / 100.0f;
 
   HWND quality = GetDlgItem(hwnd, kQualityCombo);
   state->working.quality = std::clamp(static_cast<int>(SendMessageW(quality, CB_GETCURSEL, 0, 0)), 0, 3);
@@ -129,6 +145,21 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
                                        kControlWidth, 220, kAudioCombo);
       populate_audio_combo(audioCombo, state);
       y += kRowHeight + 4;
+
+      create_control(hwnd, L"STATIC", L"A. Sensitivity", 0, kMargin, y + 4, kLabelWidth, 22, 0);
+      HWND sensSlider = create_control(hwnd, TRACKBAR_CLASSW, L"", TBS_AUTOTICKS,
+                                      kControlLeft, y, 160, 28, kSensitivitySlider);
+      // 0-1000 range maps to 0.00-10.00
+      SendMessageW(sensSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1000));
+      SendMessageW(sensSlider, TBM_SETTICFREQ, 100, 0);
+      SendMessageW(sensSlider, TBM_SETPOS, TRUE,
+                  static_cast<LPARAM>(state->working.audioSensitivity * 100.0f));
+      state->sensLabel = create_control(hwnd, L"STATIC", L"", 0,
+                                        kControlLeft + 165, y + 4, 45, 22, kSensitivityLabel);
+      update_sens_label(state, sensSlider);
+      create_control(hwnd, L"BUTTON", L"Reset", 0,
+                     kControlLeft + 215, y + 2, 50, 22, kSensitivityReset);
+      y += kRowHeight + 8;
 
       create_control(hwnd, L"STATIC", L"Detail", 0, kMargin, y + 4, kLabelWidth, 22, 0);
       HWND qualityCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, 150, 130,
@@ -176,6 +207,8 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
     case WM_HSCROLL:
       if (reinterpret_cast<HWND>(lParam) == GetDlgItem(hwnd, kFpsSlider))
         update_fps_label(state, reinterpret_cast<HWND>(lParam));
+      if (reinterpret_cast<HWND>(lParam) == GetDlgItem(hwnd, kSensitivitySlider))
+        update_sens_label(state, reinterpret_cast<HWND>(lParam));
       return 0;
     case WM_COMMAND:
       switch (LOWORD(wParam))
@@ -188,6 +221,13 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
         case kApplyButton:
           apply_settings_from_controls(hwnd, state);
           return 0;
+        case kSensitivityReset:
+        {
+          HWND slider = GetDlgItem(hwnd, kSensitivitySlider);
+          SendMessageW(slider, TBM_SETPOS, TRUE, 100); // 100 = 1.00
+          update_sens_label(state, slider);
+          return 0;
+        }
         case IDCANCEL:
           DestroyWindow(hwnd);
           return 0;

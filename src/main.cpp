@@ -83,7 +83,7 @@ std::pair<int, int> renderer_size_from_framebuffer(int framebufferWidth, int fra
   return {width, height};
 }
 
-void set_title_message(const std::string& message, int milliseconds = 1800)
+void set_title_message(const std::string& message, int milliseconds = 2000)
 {
   if (!g_window)
     return;
@@ -92,7 +92,7 @@ void set_title_message(const std::string& message, int milliseconds = 1800)
   g_messageUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds);
 }
 
-void show_osd(const std::string& message, int milliseconds = 1800)
+void show_osd(const std::string& message, int milliseconds = 3000)
 {
   g_osdMessage = message;
   g_osdUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds);
@@ -165,6 +165,7 @@ void recreate_visualizer()
   }
 
   g_audioCapture.Start(g_visualizer.get(), g_settings.audioDevice);
+  g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
   update_spout_state();
   g_lastFramebufferWidth = framebufferWidth;
   g_lastFramebufferHeight = framebufferHeight;
@@ -176,6 +177,7 @@ void apply_settings(const AppSettings& settings)
   if (g_visualizer)
     g_visualizer->SetNervousMode(g_settings.nervousMode);
   glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
+  g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
   recreate_visualizer();
 }
 
@@ -233,13 +235,16 @@ void draw_help_screen(int fw, int fh)
   const char* lines[] = {
     "fische - Keyboard Shortcuts",
     "",
+    "Esc     Exit",
     "F1      Show / hide help screen",
     "F       Toggle fullscreen",
     "N       Toggle nervous mode",
     "O       Open settings",
     "P       Pause / unpause",
     "Z       Toggle Spout output",
-    "Esc     Exit",
+    "R       Reset audio sensitivity",
+    "Up      Increase audio sensitivity",
+    "Down    Decrease audio sensitivity",
   };
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -370,6 +375,28 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       SaveSettings(g_settings);
       show_osd(g_settings.spoutEnabled ? "Spout output on" : "Spout output off");
       break;
+    case GLFW_KEY_R:
+      g_settings.audioSensitivity = 1.0f;
+      g_audioCapture.SetSensitivity(1.0f);
+      SaveSettings(g_settings);
+      show_osd("Audio Sensitivity reset to 1.00");
+      break;
+    case GLFW_KEY_UP:
+    case GLFW_KEY_DOWN:
+    {
+      float& s = g_settings.audioSensitivity;
+      float step = (s >= 1.0f && key == GLFW_KEY_UP) || (s > 1.0f && key == GLFW_KEY_DOWN)
+                  ? 0.1f : 0.01f;
+      s += (key == GLFW_KEY_UP ? step : -step);
+      s = std::round(s * 100.0f) / 100.0f;  // always 2 decimal places
+      s = std::clamp(s, 0.0f, 10.0f);
+      g_audioCapture.SetSensitivity(s);
+      SaveSettings(g_settings);
+      char buf[32];
+      snprintf(buf, sizeof(buf), "Audio Sensitivity: %.2f", s);
+      show_osd(buf);
+      break;
+    }
   }
 }
 

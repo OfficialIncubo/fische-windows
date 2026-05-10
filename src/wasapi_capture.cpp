@@ -448,6 +448,11 @@ long WasapiCapture::CaptureOnce(const std::wstring& preferredDeviceName)
       auto samples = convert_to_stereo_float(data, frames, flags, mixFormat);
       if (!samples.empty())
       {
+        float gain = m_sensitivity.load();
+        if (gain != 1.0f)
+          for (auto& s : samples)
+            s = std::clamp(s * gain, -1.0f, 1.0f);
+
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_visualizer)
           m_visualizer->AudioData(reinterpret_cast<const char*>(samples.data()),

@@ -8,6 +8,7 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
+- 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 10.
 - 📡 **Spout output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.)
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
 - 🖼️ **Fullscreen support** — toggle at any time with `F`
@@ -34,7 +35,7 @@ A Windows port of [fische](https://github.com/maysl/fische) — a standalone rea
 ## Running
 
 1. Copy `fische.exe` to any folder you want.
-2. Double-click `fische.exe`.
+2. Double-click `fische.exe` to run.
 
 On the first run, `settings.ini` is created next to the executable with default settings. Audio capture starts automatically using the default output device.
 
@@ -51,6 +52,9 @@ On the first run, `settings.ini` is created next to the executable with default 
 | `O` | Open settings dialog |
 | `P` | Pause / unpause |
 | `Z` | Toggle Spout output |
+| `R` | Reset audio sensitivity |
+| `Up` | Increase audio sensitivity |
+| `Down` | Decrease audio sensitivity |
 
 ---
 
@@ -61,6 +65,7 @@ On the first run, `settings.ini` is created next to the executable with default 
 ```ini
 [fische]
 Audio=
+AudioSensitivity=1
 Detail=High
 Quality=2
 FPSLimit=60
@@ -68,14 +73,14 @@ NervousMode=false
 UseFilePersistence=false
 SpoutSenderEnabled=false
 VSync=false
-LockAspectRatio=false
 WindowWidth=1280
 WindowHeight=720
 ```
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `Audio` | string | Friendly name of the audio device; empty = system default output |
+| `Audio` | string | Friendly name of the audio device; empty/no name match = system default output |
+| `AudioSensitivity` | 0-10 | Multiplier applied to audio input before visualization; 1 = no change |
 | `Detail` | Low / Normal / High / Extreme | Visual detail level (also written as `Quality` 0–3) |
 | `FPSLimit` | 0–240 | Target frame rate; 0 = unlimited |
 | `NervousMode` | true / false | Rapid animation mode |
@@ -96,7 +101,7 @@ See [Build Instructions.md](Build%20Instructions.md).
 
 GNU General Public License v2.0 or later.
 
-- Original fische engine: © 2012 Marcel Ebmer, © 2005–2022 Team Kodi
+- Original fische engine: © 2012 Marcel Ebmer ([@maysl](https://github.com/maysl)), © 2005–2022 Team Kodi
 - Spout: © Lynn Jarvis ([@leadedge](https://github.com/leadedge)) — BSD-style
 - Windows port and integration: see `LICENSE.md`
 
@@ -106,12 +111,12 @@ GNU General Public License v2.0 or later.
 
 | Project | Author |
 |---------|--------|
-| [fische](https://github.com/maysl/fische) | Marcel Ebmer (maysl) |
+| [fische](https://github.com/maysl/fische) | Marcel Ebmer ([maysl](https://github.com/maysl)) |
 | [visualization.fishbmc](https://github.com/xbmc/visualization.fishbmc) | Team Kodi |
 | [GLFW](https://www.glfw.org/) | Camilla Löwy and contributors |
 | [Spout](https://spout.zeal.co) | Lynn Jarvis ([leadedge](https://github.com/leadedge)) |
 | [BeatDrop loopback capture](https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/tree/master/audio) | Matthew van Eerde & Incubo_ |
-| [fische GLFW project inspiration](https://discord.com/channels/737206408482914387/1500210344621113345) | [proconsule](https://github.com/proconsule) |
+| [fische GLFW project inspiration/derived from](https://discord.com/channels/737206408482914387/1500210344621113345) | [proconsule](https://github.com/proconsule) |
 | [GLAD](https://glad.dav1d.de/) | David Herberth |
 | [GLM](https://github.com/g-truc/glm) | G-Truc Creation |
 

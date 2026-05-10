@@ -12,6 +12,7 @@ struct AppSettings
   bool useFilePersistence = false;
   bool spoutEnabled = false;
   bool vsyncEnabled = false;
+  float audioSensitivity = 1.0f;
   int windowWidth = 1280;
   int windowHeight = 720;
 };

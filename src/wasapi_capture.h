@@ -35,6 +35,7 @@ public:
   void LockVisualizer()   { m_mutex.lock(); }
   void UnlockVisualizer() { m_mutex.unlock(); }
   bool IsRunning() const { return m_running.load(); }
+  void SetSensitivity(float s) { m_sensitivity.store(s); }
 
 private:
   void ThreadMain(std::wstring preferredDeviceName);
@@ -43,6 +44,7 @@ private:
   std::mutex m_mutex;
   std::atomic<bool> m_stop{false};
   std::atomic<bool> m_running{false};
+  std::atomic<float> m_sensitivity{1.0f};
   std::thread m_thread;
   CFishBMC* m_visualizer = nullptr;
 };
