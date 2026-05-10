@@ -29,10 +29,10 @@ A Windows port of [fische](https://github.com/maysl/fische) — a real-time stan
 ## Video demos
 
 *fische for Windows Demo*
-https://github.com/yourusername/fische-windows/raw/main/demo/fischeWindowsDemo.mp4
+https://github.com/OfficialIncubo/fische-windows/raw/main/demo/fischeWindowsDemo.mp4
 
 *fische → NestDrop via Spout*
-https://github.com/yourusername/fische-windows/raw/main/demo/fischeWindowstoNestDrop.mp4
+https://github.com/OfficialIncubo/fische-windows/raw/main/demo/fischeWindowstoNestDrop.mp4
 
 ## Features
 
