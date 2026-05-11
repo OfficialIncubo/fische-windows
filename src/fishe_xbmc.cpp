@@ -295,6 +295,8 @@ void CFishBMC::Render()
 //  FISHE_LOG_DEBUG("Pixel: R=%d G=%d B=%d A=%d",pixel[0], pixel[1], pixel[2], pixel[4]);
 
   finish_render();
+  // Make sure all drawing commands are complete before Spout copies the frame.
+  glFinish();
   SendFrame(Sender);
 
 }
@@ -431,6 +433,10 @@ void CFishBMC::start_render()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // Keep the framebuffer alpha channel opaque so Spout does not
+  // capture a translucent frame and darken it on the receiver side.
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
+
   // disable depth testing
   glDisable(GL_DEPTH_TEST);
 
@@ -452,6 +458,7 @@ void CFishBMC::finish_render()
 {
   glDisableVertexAttribArray(m_aCoordLoc);
   glDisableVertexAttribArray(m_aVertexLoc);
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
 void CFishBMC::on_beat(void* handler, double frames_per_beat)
@@ -486,7 +493,6 @@ void CFishBMC::SendFrame(SpoutSender* sender)
     sender->SendFbo(0, static_cast<unsigned>(fbWidth), static_cast<unsigned>(fbHeight), true);
 }
 
-// After:
 std::filesystem::path CFishBMC::vector_cache_path() const
 {
   std::filesystem::path dir = GetExecutableDirectory() / "vectors";
