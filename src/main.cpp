@@ -203,6 +203,9 @@ void apply_settings(const AppSettings& settings)
     g_visualizer->SetNervousMode(g_settings.nervousMode);
   glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
   g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
+  g_alwaysOnTop = g_settings.alwaysOnTop ? true : false;
+  HWND hwnd = glfwGetWin32Window(g_window);
+  SetWindowPos(hwnd, g_settings.alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
   if (!g_fullscreen)
     glfwSetWindowSize(g_window, g_settings.windowWidth, g_settings.windowHeight);
   recreate_visualizer();
@@ -598,9 +601,6 @@ int main(int, char**)
     SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
   }
 
-  if (g_settings.alwaysOnTop)
-    set_always_on_top(true);
-
   glfwMakeContextCurrent(g_window);
   glfwSetKeyCallback(g_window, key_callback);
   glfwSetMouseButtonCallback(g_window, mouse_button_callback);
@@ -614,6 +614,9 @@ int main(int, char**)
     glfwTerminate();
     return 1;
   }
+
+  if (g_settings.alwaysOnTop)
+    set_always_on_top(true);
   
   init_gl_font();
   glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);

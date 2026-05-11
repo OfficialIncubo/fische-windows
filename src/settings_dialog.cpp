@@ -219,9 +219,9 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       SendMessageW(vsync, BM_SETCHECK, state->working.vsyncEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
       y += 28;
 
-      HWND alwaysOnTop = create_control(hwnd, L"BUTTON", L"Always on top", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
+      HWND alwaysontop = create_control(hwnd, L"BUTTON", L"Always on top", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
                                         kAlwaysOnTopCheck);
-      SendMessageW(alwaysOnTop, BM_SETCHECK, state->working.alwaysOnTop ? BST_CHECKED : BST_UNCHECKED, 0);
+      SendMessageW(alwaysontop, BM_SETCHECK, state->working.alwaysOnTop ? BST_CHECKED : BST_UNCHECKED, 0);
 
       create_control(hwnd, L"BUTTON", L"OK", BS_DEFPUSHBUTTON, kDialogWidth - 252, kDialogHeight - 78, 70, 28, IDOK);
       create_control(hwnd, L"BUTTON", L"Apply", 0, kDialogWidth - 172, kDialogHeight - 78, 70, 28, kApplyButton);
