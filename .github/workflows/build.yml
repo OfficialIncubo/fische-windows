@@ -9,10 +9,15 @@ on:
   pull_request:
     branches:
       - '**'
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build ${{ matrix.manifest_mode == 'ON' && 'with vcpkg''s manifest mode' || 'without vcpkg''s manifest mode' }}
     runs-on: windows-latest
+    strategy:
+      matrix:
+        manifest_mode: ['ON', 'OFF']
 
     steps:
       - name: Checkout
@@ -21,18 +26,43 @@ jobs:
       - name: Cache vcpkg packages
         uses: actions/cache@v5
         with:
-          path: C:\vcpkg\installed
-          key: vcpkg-x64-windows-static-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
-          restore-keys: vcpkg-x64-windows-static-
+          # Cache both global and manifest paths
+          path: |
+            C:\vcpkg\installed
+            vcpkg_installed
+          key: vcpkg-x64-windows-static-manifest-${{ matrix.manifest_mode }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: vcpkg-x64-windows-static-manifest-${{ matrix.manifest_mode }}-
 
-      - name: Install dependencies via vcpkg
+      - name: Update vcpkg baseline
+        run: vcpkg x-update-baseline
+
+      - name: Install dependencies via vcpkg (Manifest Mode)
+        if: matrix.manifest_mode == 'ON'
         run: vcpkg install --triplet x64-windows-static
+
+      - name: Install dependencies via vcpkg (Classic Mode)
+        if: matrix.manifest_mode == 'OFF'
+        run: |
+          # 1. Parse dependencies from vcpkg.json
+          $manifest = Get-Content vcpkg.json -Raw | ConvertFrom-Json
+          $deps = $manifest.dependencies | ForEach-Object { if ($_.name) { $_.name } else { $_ } }
+          
+          # 2. Rename the manifest so CMake/vcpkg don't implicitly fallback to manifest mode
+          Rename-Item vcpkg.json vcpkg.json.bak
+          
+          # 3. Install parsed dependencies globally (Classic Mode)
+          if ($deps) {
+            $depList = $deps -join " "
+            Invoke-Expression "vcpkg install $depList --triplet x64-windows-static"
+          }
+        shell: pwsh
 
       - name: Configure CMake
         run: >
           cmake -B build 
           -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake 
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static 
+          -DVCPKG_MANIFEST_MODE=${{ matrix.manifest_mode }}
 
       - name: Build
         run: cmake --build build --config Release
@@ -46,7 +76,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: fische-windows
+          name: fische-windows-manifest-${{ matrix.manifest_mode }}
           path: dist/
 
       # - name: Upload release asset (on tag)
