@@ -59,7 +59,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 
 ## The story
 
-4 years ago (almost the end of August 2022), I've stumbled across FishBMC while playing some tunes on [Kodi](https://kodi.tv) using my phone (the old phone was Huawei P30 lite for me). A few days ago, I've decided to fully port this standalone visualization by the same name ([fische](https://github.com/maysl/fische)) to Windows, first thing I've tried to port it by using [ChatGPT Codex](chatgpt.com/codex/), but this one did a very great job on a first try. I've then refined and added some features using [Claude](https://claude.ai) and my own work, idea and inspiration. For me it looks like it's [MilkDrop](https://www.geisswerks.com/milkdrop/)-ish inspired UI in-render + a very much excitement of new additional features, Spout visual sending, functional hotkeys, settings dialog and so on. That's a story.
+4 years ago (almost the end of August 2022), I've stumbled across FishBMC while playing some tunes on [Kodi](https://kodi.tv) using my phone (the old phone was Huawei P30 lite for me). A few days ago, I've decided to fully port this standalone visualization by the same name ([fische](https://github.com/maysl/fische)) to Windows, first thing I've tried to port it by using [ChatGPT Codex](https://chatgpt.com/codex/), but this one did a very great job on a first try. I've then refined and added some features using [Claude](https://claude.ai) and my own work, idea and inspiration. For me it looks like it's [MilkDrop](https://www.geisswerks.com/milkdrop/)-ish inspired UI in-render + a very much excitement of new additional features, Spout visual sending, functional hotkeys, settings dialog and so on. That's a story.
 
 ---
 
