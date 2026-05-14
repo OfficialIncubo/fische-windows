@@ -80,6 +80,16 @@ double quality_scale(int quality)
   return 0.85;
 }
 
+void apply_vsync(int mode)
+{
+  switch (mode)
+  {
+    case 1:  glfwSwapInterval(1);  break;  // On
+    case 2:  glfwSwapInterval(-1); break;  // Adaptive
+    default: glfwSwapInterval(0);  break;  // Off
+  }
+}
+
 std::pair<int, int> renderer_size_from_framebuffer(int framebufferWidth, int framebufferHeight)
 {
   double scale = quality_scale(g_settings.quality);
@@ -201,7 +211,7 @@ void apply_settings(const AppSettings& settings)
   g_settings = settings;
   if (g_visualizer)
     g_visualizer->SetNervousMode(g_settings.nervousMode);
-  glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
+  apply_vsync(g_settings.vsyncMode);
   g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
   g_alwaysOnTop = g_settings.alwaysOnTop ? true : false;
   HWND hwnd = glfwGetWin32Window(g_window);
@@ -528,7 +538,7 @@ void maybe_handle_resize()
   if (g_lastResizeChange.time_since_epoch().count() == 0)
     g_lastResizeChange = now;
 
-  if (now - g_lastResizeChange > std::chrono::milliseconds(350))
+  if (now - g_lastResizeChange > std::chrono::milliseconds(250))
   {
     recreate_visualizer();
     g_lastResizeChange = {};
@@ -618,7 +628,7 @@ int main(int, char**)
     set_always_on_top(true);
   
   init_gl_font();
-  glfwSwapInterval(g_settings.vsyncEnabled ? 1 : 0); // glfwSwapInterval(g_settings.fpsLimit <= 0 ? 1 : 0);
+  apply_vsync(g_settings.vsyncMode);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

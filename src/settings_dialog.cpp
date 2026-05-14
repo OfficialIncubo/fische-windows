@@ -25,7 +25,7 @@ constexpr int kNervousCheck = 1005;
 constexpr int kPersistenceCheck = 1006;
 constexpr int kSpoutCheck = 1007;
 constexpr int kApplyButton = 1008;
-constexpr int kVSyncCheck = 1009;
+constexpr int kVSyncCombo = 1009;
 constexpr int kSensitivitySlider = 1010;
 constexpr int kSensitivityLabel = 1011;
 constexpr int kSensitivityReset = 1012;
@@ -125,7 +125,7 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   state->working.nervousMode = SendMessageW(GetDlgItem(hwnd, kNervousCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.useFilePersistence = SendMessageW(GetDlgItem(hwnd, kPersistenceCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.spoutEnabled = SendMessageW(GetDlgItem(hwnd, kSpoutCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
-  state->working.vsyncEnabled = SendMessageW(GetDlgItem(hwnd, kVSyncCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
+  state->working.vsyncMode = std::clamp(static_cast<int>(SendMessageW(GetDlgItem(hwnd, kVSyncCombo), CB_GETCURSEL, 0, 0)), 0, 2);
   state->working.alwaysOnTop = SendMessageW(GetDlgItem(hwnd, kAlwaysOnTopCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
 
   *state->settings = state->working;
@@ -182,6 +182,14 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       SendMessageW(qualityCombo, CB_SETCURSEL, std::clamp(state->working.quality, 0, 3), 0);
       y += kRowHeight + 4;
 
+      create_control(hwnd, L"STATIC", L"VSync", 0, kMargin, y + 4, kLabelWidth, 22, 0);
+      HWND vsyncCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, 120, 80, kVSyncCombo);
+      SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Off"));
+      SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"On"));
+      SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Adaptive"));
+      SendMessageW(vsyncCombo, CB_SETCURSEL, std::clamp(state->working.vsyncMode, 0, 2), 0);
+      y += kRowHeight + 4;
+
       create_control(hwnd, L"STATIC", L"Window size", 0, kMargin, y + 4, kLabelWidth, 22, 0);
       HWND widthEdit = create_control(hwnd, L"EDIT", L"", ES_NUMBER | WS_BORDER, kControlLeft, y, 70, 22, kWidthEdit);
       create_control(hwnd, L"STATIC", L"\u00D7", 0, kControlLeft + 76, y + 4, 12, 22, 0);
@@ -214,11 +222,6 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       HWND spout = create_control(hwnd, L"BUTTON", L"Spout output", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
                                   kSpoutCheck);
       SendMessageW(spout, BM_SETCHECK, state->working.spoutEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
-      y += 28;
-
-      HWND vsync = create_control(hwnd, L"BUTTON", L"Enable VSync", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
-                                  kVSyncCheck);
-      SendMessageW(vsync, BM_SETCHECK, state->working.vsyncEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
       y += 28;
 
       HWND alwaysontop = create_control(hwnd, L"BUTTON", L"Always on top", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,

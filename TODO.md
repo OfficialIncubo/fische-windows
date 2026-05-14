@@ -1,7 +1,7 @@
 # For version 2.2:
 - [ ] Fix aspect ratio for portrait/tall screens
 - [x] Add `Default` button to Speed/FPS to settings dialog/UI.
-- [ ] Implement adaptive VSync; replaces `Enable VSync` checkbox with a dropdown and 3 options: On, Off and Adaptive.
+- [x] Implement adaptive VSync; replaces `Enable VSync` checkbox with a dropdown and 3 options: On, Off and Adaptive.
 
 # For version 2.3:
 - [ ] Implement show/hide window/render feature

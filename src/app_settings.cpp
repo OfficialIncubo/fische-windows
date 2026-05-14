@@ -144,7 +144,12 @@ AppSettings LoadSettings()
   if (auto it = values.find("spoutsenderenabled"); it != values.end())
     settings.spoutEnabled = parse_bool(it->second, settings.spoutEnabled);
   if (auto it = values.find("vsync"); it != values.end())
-    settings.vsyncEnabled = parse_bool(it->second, settings.vsyncEnabled);
+  {
+    const std::string& v = lower(trim(it->second));
+    if (v == "on" || v == "1" || v == "true")       settings.vsyncMode = 1;
+    else if (v == "adaptive" || v == "-1")           settings.vsyncMode = 2;
+    else                                             settings.vsyncMode = 0;
+  }
   if (auto it = values.find("alwaysontop"); it != values.end())
     settings.alwaysOnTop = parse_bool(it->second, settings.alwaysOnTop);
   if (auto it = values.find("windowwidth"); it != values.end())
@@ -161,6 +166,8 @@ void SaveSettings(const AppSettings& settings)
   if (!file)
     return;
 
+  const char* vsyncStr[] = {"Off", "On", "Adaptive"};
+
   file << "[fische]\n";
   file << "Audio=" << settings.audioDevice << "\n";
   file << "AudioSensitivity=" << settings.audioSensitivity << "\n";
@@ -170,7 +177,7 @@ void SaveSettings(const AppSettings& settings)
   file << "NervousMode=" << (settings.nervousMode ? "true" : "false") << "\n";
   file << "UseFilePersistence=" << (settings.useFilePersistence ? "true" : "false") << "\n";
   file << "SpoutSenderEnabled=" << (settings.spoutEnabled ? "true" : "false") << "\n";
-  file << "VSync=" << (settings.vsyncEnabled ? "true" : "false") << "\n";
+  file << "VSync=" << vsyncStr[std::clamp(settings.vsyncMode, 0, 2)] << "\n";
   file << "AlwaysOnTop=" << (settings.alwaysOnTop ? "true" : "false") << "\n";
   file << "WindowWidth=" << std::max(settings.windowWidth, 320) << "\n";
   file << "WindowHeight=" << std::max(settings.windowHeight, 240) << "\n";

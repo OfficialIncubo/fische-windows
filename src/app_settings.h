@@ -12,7 +12,7 @@ struct AppSettings
   bool nervousMode = false;
   bool useFilePersistence = false;
   bool spoutEnabled = false;
-  bool vsyncEnabled = false;
+  int vsyncMode = 0; // 0 = Off, 1 = On, 2 = Adaptive
   float audioSensitivity = 1.0f;
   int windowWidth = 1280;
   int windowHeight = 720;

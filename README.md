@@ -117,7 +117,7 @@ FPSLimit=60
 NervousMode=false
 UseFilePersistence=false
 SpoutSenderEnabled=false
-VSync=false
+VSync=Off
 AlwaysOnTop=false
 WindowWidth=1280
 WindowHeight=720
@@ -132,7 +132,7 @@ WindowHeight=720
 | `NervousMode` | true / false | Rapid animation mode |
 | `UseFilePersistence` | true / false | Cache vector fields to `vectors/` folder |
 | `SpoutSenderEnabled` | true / false | Enable Spout texture sharing |
-| `VSync` | true / false | Enable VSync (`glfwSwapInterval`) |
+| `VSync` | Off / On / Adaptive | VSync mode; Adaptive mode uses `glfwSwapInterval(-1)`, which reduces tearing without hard locking the frame rate |
 | `AlwaysOnTop` | true / false | Keep the visual window above all other windows |
 | `WindowWidth` / `WindowHeight` | integer | Last window size; restored on next launch |
 
