@@ -32,6 +32,7 @@ constexpr int kSensitivityReset = 1012;
 constexpr int kAlwaysOnTopCheck = 1013;
 constexpr int kWidthEdit  = 1014;
 constexpr int kHeightEdit = 1015;
+constexpr int kFpsReset = 1016;
 
 struct DialogState
 {
@@ -168,7 +169,7 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
                                         kControlLeft + 165, y + 4, 45, 22, kSensitivityLabel);
       update_sens_label(state, sensSlider);
       create_control(hwnd, L"BUTTON", L"Reset", 0,
-                     kControlLeft + 215, y + 2, 50, 22, kSensitivityReset);
+                     kControlLeft + 215, y + 2, 65, 22, kSensitivityReset);
       y += kRowHeight + 8;
 
       create_control(hwnd, L"STATIC", L"Detail", 0, kMargin, y + 4, kLabelWidth, 22, 0);
@@ -191,12 +192,13 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       y += kRowHeight + 4;
 
       create_control(hwnd, L"STATIC", L"Speed", 0, kMargin, y + 4, kLabelWidth, 22, 0);
-      HWND fpsSlider = create_control(hwnd, TRACKBAR_CLASSW, L"", TBS_AUTOTICKS, kControlLeft, y, 190, 28, kFpsSlider);
+      HWND fpsSlider = create_control(hwnd, TRACKBAR_CLASSW, L"", TBS_AUTOTICKS, kControlLeft, y, 160, 28, kFpsSlider);
       SendMessageW(fpsSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 240));
       SendMessageW(fpsSlider, TBM_SETTICFREQ, 30, 0);
       SendMessageW(fpsSlider, TBM_SETPOS, TRUE, std::clamp(state->working.fpsLimit, 0, 240));
-      state->fpsLabel = create_control(hwnd, L"STATIC", L"", 0, kControlLeft + 200, y + 4, 80, 22, kFpsLabel);
+      state->fpsLabel = create_control(hwnd, L"STATIC", L"", 0, kControlLeft + 165, y + 4, 45, 22, kFpsLabel);
       update_fps_label(state, fpsSlider);
+      create_control(hwnd, L"BUTTON", L"Default", 0, kControlLeft + 215, y + 2, 65, 22, kFpsReset);
       y += kRowHeight + 8;
 
       HWND nervous = create_control(hwnd, L"BUTTON", L"Nervous mode", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
@@ -250,6 +252,13 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
           HWND slider = GetDlgItem(hwnd, kSensitivitySlider);
           SendMessageW(slider, TBM_SETPOS, TRUE, 100); // 100 = 1.00
           update_sens_label(state, slider);
+          return 0;
+        }
+        case kFpsReset:
+        {
+          HWND slider = GetDlgItem(hwnd, kFpsSlider);
+          SendMessageW(slider, TBM_SETPOS, TRUE, 60);
+          update_fps_label(state, slider);
           return 0;
         }
         case IDCANCEL:

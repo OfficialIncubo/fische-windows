@@ -606,7 +606,6 @@ int main(int, char**)
   glfwSetMouseButtonCallback(g_window, mouse_button_callback);
   glfwSetCursorPosCallback(g_window, cursor_pos_callback);
 
-
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
   {
     if (g_font) { DeleteObject(g_font); g_font = nullptr; }

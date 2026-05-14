@@ -1,7 +1,6 @@
 # For version 2.2:
-- [ ] Let the visualizer keep running when minimized (useful when outputting the visual with [Spout](https://spout.zeal.co))
 - [ ] Fix aspect ratio for portrait/tall screens
-- [ ] Add `Default` button to Speed/FPS to settings dialog/UI.
+- [x] Add `Default` button to Speed/FPS to settings dialog/UI.
 - [ ] Implement adaptive VSync; replaces `Enable VSync` checkbox with a dropdown and 3 options: On, Off and Adaptive.
 
 # For version 2.3:
@@ -11,3 +10,4 @@
 # Uncategorized/Optional:
 - [ ] Update to GLFW 3.5 (if available)
 - [ ] ASIO Support
+- [ ] ~~Let the visualizer keep running when minimized (useful when outputting the visual with [Spout](https://spout.zeal.co))~~ (no idea/not planned)
