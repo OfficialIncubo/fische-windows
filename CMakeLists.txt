@@ -20,6 +20,9 @@ if(NOT glm_FOUND)
 endif()
 
 set(RESOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/fische.rc")
+set_source_files_properties(${RESOURCE_FILE} PROPERTIES
+    COMPILE_FLAGS "/nologo"
+)
 
 add_executable(fische
   src/analyst.cpp
