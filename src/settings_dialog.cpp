@@ -173,7 +173,7 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       y += kRowHeight + 8;
 
       create_control(hwnd, L"STATIC", L"Detail", 0, kMargin, y + 4, kLabelWidth, 22, 0);
-      HWND qualityCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, 150, 130,
+      HWND qualityCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, kControlWidth, 220,
                                          kQualityCombo);
       SendMessageW(qualityCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Low"));
       SendMessageW(qualityCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Normal"));
@@ -183,7 +183,7 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       y += kRowHeight + 4;
 
       create_control(hwnd, L"STATIC", L"VSync", 0, kMargin, y + 4, kLabelWidth, 22, 0);
-      HWND vsyncCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, 120, 80, kVSyncCombo);
+      HWND vsyncCombo = create_control(hwnd, L"COMBOBOX", L"", CBS_DROPDOWNLIST, kControlLeft, y, kControlWidth, 220, kVSyncCombo);
       SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Off"));
       SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"On"));
       SendMessageW(vsyncCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Adaptive"));
