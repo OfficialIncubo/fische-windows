@@ -205,6 +205,7 @@ void AsioCapture::OnBufferSwitch(long index)
     return;
 
   std::vector<float> samples(m_bufferSize * 2, 0.0f);
+  float gain = m_sensitivity.load();
 
   for (long s = 0; s < m_bufferSize; ++s)
   {
@@ -212,7 +213,10 @@ void AsioCapture::OnBufferSwitch(long index)
     {
       uint8_t* base = static_cast<uint8_t*>(g_bufferInfos[ch].buffers[index]);
       void*    src  = base + s * 4;
-      samples[static_cast<size_t>(s * 2 + ch)] = AsioSampleToFloat(src, m_sampleType);
+      float    val  = AsioSampleToFloat(src, m_sampleType);
+      if (gain != 1.0f)
+        val = std::clamp(val * gain, -1.0f, 1.0f);
+      samples[static_cast<size_t>(s * 2 + ch)] = val;
     }
   }
 
