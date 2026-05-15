@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "settings_dialog.h"
 #include "spout/SpoutSender.h"
+#include "asio_capture.h"
 #include "wasapi_capture.h"
 
 #include <GLFW/glfw3.h>
@@ -23,6 +24,7 @@ AppSettings g_settings;
 bool g_pendingApply = false;
 AppSettings g_pendingSettings;
 std::unique_ptr<CFishBMC> g_visualizer;
+AsioCapture g_asioCapture;
 WasapiCapture g_audioCapture;
 SpoutSender g_spout;
 bool g_helpVisible = false;
@@ -159,6 +161,7 @@ void recreate_visualizer()
   auto [renderWidth, renderHeight] = renderer_size_from_framebuffer(framebufferWidth, framebufferHeight);
 
   g_audioCapture.Stop();
+  g_asioCapture.Stop();
   {
     g_audioCapture.LockVisualizer();
     g_visualizer.reset();
@@ -179,7 +182,16 @@ void recreate_visualizer()
     return;
   }
 
-  g_audioCapture.Start(g_visualizer.get(), g_settings.audioDevice);
+  const std::string& dev = g_settings.audioDevice;
+  if (!dev.empty() && dev.rfind("[ASIO]", 0) == 0)
+  {
+    std::string asioName = dev.substr(7); // strip "[ASIO] "
+    g_asioCapture.Start(g_visualizer.get(), asioName);
+  }
+  else
+  {
+    g_audioCapture.Start(g_visualizer.get(), dev);
+  }
   g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
   update_spout_state();
   g_lastFramebufferWidth = framebufferWidth;

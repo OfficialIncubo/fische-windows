@@ -24,6 +24,17 @@ set_source_files_properties(${RESOURCE_FILE} PROPERTIES
     COMPILE_FLAGS "/nologo"
 )
 
+set(ASIO_DIR ${PROJECT_SOURCE_DIR}/src/asio)
+
+set_source_files_properties(
+  src/asio/common/asio.cpp
+  src/asio/host/asiodrivers.cpp
+  src/asio/host/pc/asiolist.cpp
+  PROPERTIES
+  COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS"
+  COMPILE_FLAGS "/FI\"objbase.h\""
+)
+
 add_executable(fische
   src/analyst.cpp
   src/audiobuffer.cpp
@@ -51,11 +62,19 @@ add_executable(fische
   src/spout/SpoutSharedMemory.cpp
   src/spout/SpoutReceiver.cpp
   src/spout/SpoutCopy.cpp
+  src/asio_capture.h
+  src/asio_capture.cpp
+  ${ASIO_DIR}/common/asio.cpp
+  ${ASIO_DIR}/host/asiodrivers.cpp
+  ${ASIO_DIR}/host/pc/asiolist.cpp
   ${RESOURCE_FILE})
 
 target_include_directories(fische PRIVATE
   ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_SOURCE_DIR}/src/glad/include)
+  ${PROJECT_SOURCE_DIR}/src/glad/include
+  ${ASIO_DIR}/common
+  ${ASIO_DIR}/host
+  ${ASIO_DIR}/host/pc)
 
 if(glm_FOUND)
   target_link_libraries(fische PRIVATE glm::glm)

@@ -1,5 +1,6 @@
 #include "settings_dialog.h"
 
+#include "asio_capture.h"
 #include "wasapi_capture.h"
 
 #include <algorithm>
@@ -92,6 +93,21 @@ void populate_audio_combo(HWND combo, DialogState* state)
     index = static_cast<int>(SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(label.c_str())));
     SendMessageW(combo, CB_SETITEMDATA, index, static_cast<LPARAM>(i));
     if (!state->working.audioDevice.empty() && _wcsicmp(device.name.c_str(), Utf8ToWide(state->working.audioDevice).c_str()) == 0)
+      selected = index;
+  }
+
+  auto asioDevices = EnumerateAsioDevices();
+  for (const auto& dev : asioDevices)
+  {
+    std::wstring label = L"ASIO: " + Utf8ToWide(dev.name);
+    std::string  stored = "[ASIO] " + dev.name;
+    index = static_cast<int>(SendMessageW(combo, CB_ADDSTRING, 0,
+                reinterpret_cast<LPARAM>(label.c_str())));
+    SendMessageW(combo, CB_SETITEMDATA, index, static_cast<LPARAM>(
+                state->devices.size() + dev.index));  // offset past WASAPI
+
+    if (!state->working.audioDevice.empty() &&
+        state->working.audioDevice == stored)
       selected = index;
   }
 

@@ -36,6 +36,7 @@ public:
   void UnlockVisualizer() { m_mutex.unlock(); }
   bool IsRunning() const { return m_running.load(); }
   void SetSensitivity(float s) { m_sensitivity.store(s); }
+  bool IsAsioDevice(const std::string& name) { return name.rfind("[ASIO]", 0) == 0; }
 
 private:
   void ThreadMain(std::wstring preferredDeviceName);
