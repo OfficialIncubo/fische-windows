@@ -48,6 +48,7 @@ private:
   long               m_inputChannels  = 0;
   long               m_bufferSize     = 0;
   double             m_sampleRate     = 44100.0;
+  int                m_sampleTypes[2] = {0, 0};
   int                m_sampleType     = 0; // ASIOSampleType
   bool               m_postOutput     = false;
 };

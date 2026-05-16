@@ -57,31 +57,69 @@ static float AsioSampleToFloat(void* buf, long sampleType)
 {
   switch (sampleType)
   {
-    case 8:  // ASIOSTInt32LSB
-    case 16:
-    {
-      int32_t v;
-      memcpy(&v, buf, 4);
-      return static_cast<float>(v) / static_cast<float>(0x7fffffff);
-    }
-    case 14: // ASIOSTFloat32LSB
+    case ASIOSTFloat32LSB:  // 14
     {
       float v;
       memcpy(&v, buf, 4);
       return v;
     }
-    case 15: // ASIOSTFloat64LSB
+    case ASIOSTFloat64LSB:  // 15
     {
       double v;
       memcpy(&v, buf, 8);
       return static_cast<float>(v);
     }
-    default:
+    case ASIOSTInt32LSB:    // 8
     {
       int32_t v;
       memcpy(&v, buf, 4);
-      return static_cast<float>(v) / static_cast<float>(0x7fffffff);
+      return static_cast<float>(v) / 2147483648.0f;
     }
+    case ASIOSTInt24LSB:    // 6
+    {
+      int32_t v = 0;
+      memcpy(&v, buf, 3);
+      if (v & 0x800000) v |= 0xFF000000; // sign extend
+      return static_cast<float>(v) / 8388608.0f;
+    }
+    case ASIOSTInt16LSB:    // 4
+    {
+      int16_t v;
+      memcpy(&v, buf, 2);
+      return static_cast<float>(v) / 32768.0f;
+    }
+    case ASIOSTInt32LSB16:  // 16 — 32-bit container, 16-bit data
+    {
+      int32_t v;
+      memcpy(&v, buf, 4);
+      return static_cast<float>(static_cast<int16_t>(v & 0xFFFF)) / 32768.0f;
+    }
+    case ASIOSTInt32LSB18:  // 17
+    case ASIOSTInt32LSB20:  // 18
+    case ASIOSTInt32LSB24:  // 19
+    {
+      int32_t v;
+      memcpy(&v, buf, 4);
+      return static_cast<float>(v) / 2147483648.0f;
+    }
+    default:
+    {
+      // Unknown — try int32
+      int32_t v;
+      memcpy(&v, buf, 4);
+      return static_cast<float>(v) / 2147483648.0f;
+    }
+  }
+}
+
+static int AsioSampleBytes(long sampleType)
+{
+  switch (sampleType)
+  {
+    case ASIOSTInt16LSB:                             return 2;
+    case ASIOSTInt24LSB:                             return 3;
+    case ASIOSTFloat64LSB:                           return 8;
+    default:                                         return 4;
   }
 }
 
@@ -151,10 +189,18 @@ bool AsioCapture::InitDriver(const std::string& name)
     return false;
 
   long numIn = 0, numOut = 0;
-  if (ASIOGetChannels(&numIn, &numOut) != ASE_OK)
-    return false;
+  ASIOGetChannels(&numIn, &numOut);
 
-  m_inputChannels = std::min(numIn, 2L);
+  bool useInput = (numIn > 0);
+  m_inputChannels = useInput ? std::min(numIn, 2L) : std::min(numOut, 2L);
+
+  for (long i = 0; i < m_inputChannels; ++i)
+  {
+    g_bufferInfos[i].isInput    = useInput ? ASIOTrue : ASIOFalse;
+    g_bufferInfos[i].channelNum = i;
+    g_bufferInfos[i].buffers[0] = nullptr;
+    g_bufferInfos[i].buffers[1] = nullptr;
+  }
 
   long minBuf, maxBuf, prefBuf, gran;
   if (ASIOGetBufferSize(&minBuf, &maxBuf, &prefBuf, &gran) != ASE_OK)
@@ -170,10 +216,10 @@ bool AsioCapture::InitDriver(const std::string& name)
 
   for (long i = 0; i < m_inputChannels; ++i)
   {
-    g_bufferInfos[i].isInput    = ASIOTrue;
-    g_bufferInfos[i].channelNum = i;
-    g_bufferInfos[i].buffers[0] = nullptr;
-    g_bufferInfos[i].buffers[1] = nullptr;
+    g_channelInfos[i].channel = i;
+    g_channelInfos[i].isInput = useInput ? ASIOTrue : ASIOFalse;
+    ASIOGetChannelInfo(&g_channelInfos[i]);
+    m_sampleTypes[i] = g_channelInfos[i].type;
   }
 
   g_callbacks.bufferSwitch         = &AsioCapture::StaticBufferSwitch;
@@ -206,14 +252,17 @@ void AsioCapture::OnBufferSwitch(long index)
 
   std::vector<float> samples(m_bufferSize * 2, 0.0f);
   float gain = m_sensitivity.load();
+  int   bytesPerSample = AsioSampleBytes(m_sampleType);
 
   for (long s = 0; s < m_bufferSize; ++s)
   {
     for (long ch = 0; ch < m_inputChannels; ++ch)
     {
-      uint8_t* base = static_cast<uint8_t*>(g_bufferInfos[ch].buffers[index]);
-      void*    src  = base + s * 4;
-      float    val  = AsioSampleToFloat(src, m_sampleType);
+      int      sampleType     = m_sampleTypes[ch];
+      int      bytesPerSample = AsioSampleBytes(sampleType);
+      uint8_t* base           = static_cast<uint8_t*>(g_bufferInfos[ch].buffers[index]);
+      void*    src            = base + s * bytesPerSample;
+      float    val            = AsioSampleToFloat(src, sampleType);
       if (gain != 1.0f)
         val = std::clamp(val * gain, -1.0f, 1.0f);
       samples[static_cast<size_t>(s * 2 + ch)] = val;
