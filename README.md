@@ -1,3 +1,9 @@
+[![Build Status](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml)
+[![Latest Version](https://img.shields.io/github/v/release/OfficialIncubo/fische-windows?label=Version&color=96AFFF)](https://github.com/OfficialIncubo/fische-windows/releases/latest)
+[![Total Downloads](https://img.shields.io/github/downloads/OfficialIncubo/fische-windows/total?label=Total%20Downloads&color=7FDDF2)](https://github.com/OfficialIncubo/fische-windows/releases)
+[![Languages Count](https://img.shields.io/github/languages/count/OfficialIncubo/fische-windows?label=Languages&color=FFE096)](https://github.com/OfficialIncubo/fische-windows)
+[![License](https://img.shields.io/github/license/OfficialIncubo/fische-windows?label=License&color=EAA3FF)](https://github.com/OfficialIncubo/fische-windows/blob/master/LICENSE.md)
+
 # fische for Windows
 
 A Windows port of [fische](https://github.com/maysl/fische) — a real-time standalone music visualizer originally built for Linux. This port brings fische to Windows with native WASAPI loopback audio capture, [Spout](https://spout.zeal.co/) texture sharing for sending the visualization to other apps, OpenGL rendering via GLFW, adjustable audio sensitivity, VSync and FPS control, always-on-top, fullscreen, and a native Win32 settings dialog — all packed into a single portable executable.
@@ -176,3 +182,7 @@ GNU General Public License v2.0 or later.
 - Spout: https://spout.zeal.co/
 - WASAPI loopback capture by Matthew van Eerde: https://matthewvaneerde.wordpress.com/2008/12/16/sample-wasapi-loopback-capture-record-what-you-hear/
 - BeatDrop Music Visualizer: a custom MilkDrop2 standalone visualization for Windows: https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=OfficialIncubo/fische-windows&type=Date)](https://star-history.com/#OfficialIncubo/fische-windows&Date)
