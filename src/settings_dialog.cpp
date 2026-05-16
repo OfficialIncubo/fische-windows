@@ -1,5 +1,6 @@
 #include "settings_dialog.h"
 
+#include "asio_capture.h"
 #include "wasapi_capture.h"
 
 #include <algorithm>
@@ -95,6 +96,21 @@ void populate_audio_combo(HWND combo, DialogState* state)
       selected = index;
   }
 
+  auto asioDevices = EnumerateAsioDevices();
+  for (const auto& dev : asioDevices)
+  {
+    std::wstring label = L"ASIO: " + Utf8ToWide(dev.name);
+    std::string stored = "[ASIO] " + dev.name;
+    index = static_cast<int>(SendMessageW(combo, CB_ADDSTRING, 0,
+                reinterpret_cast<LPARAM>(label.c_str())));
+    // Use negative sentinel: -2, -3, -4... to distinguish from WASAPI
+    SendMessageW(combo, CB_SETITEMDATA, index,
+                static_cast<LPARAM>(-2 - dev.index));
+    if (!state->working.audioDevice.empty() &&
+        state->working.audioDevice == stored)
+      selected = index;
+  }
+
   SendMessageW(combo, CB_SETCURSEL, selected, 0);
 }
 
@@ -103,10 +119,27 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   HWND audio = GetDlgItem(hwnd, kAudioCombo);
   int audioIndex = static_cast<int>(SendMessageW(audio, CB_GETCURSEL, 0, 0));
   LPARAM data = SendMessageW(audio, CB_GETITEMDATA, audioIndex, 0);
+
   if (data >= 0 && static_cast<size_t>(data) < state->devices.size())
+  {
+    // WASAPI device
     state->working.audioDevice = WideToUtf8(state->devices[static_cast<size_t>(data)].name);
+  }
+  else if (data <= -2)
+  {
+    // ASIO device — reconstruct stored name from combo label
+    wchar_t label[256] = {};
+    SendMessageW(audio, CB_GETLBTEXT, audioIndex, reinterpret_cast<LPARAM>(label));
+    // Label is "ASIO: <name>", stored is "[ASIO] <name>"
+    std::wstring wlabel(label);
+    if (wlabel.rfind(L"ASIO: ", 0) == 0)
+      state->working.audioDevice = "[ASIO] " + WideToUtf8(wlabel.substr(6));
+  }
   else
+  {
+    // Default output device
     state->working.audioDevice.clear();
+  }
 
   HWND sens = GetDlgItem(hwnd, kSensitivitySlider);
   state->working.audioSensitivity = static_cast<float>(SendMessageW(sens, TBM_GETPOS, 0, 0)) / 100.0f;

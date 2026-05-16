@@ -46,6 +46,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 
 - 🎵 **Real-time audio visualization** — reacts to whatever is playing on your speakers, microphone or any virtual cable;
 - 🔊 **WASAPI loopback capture** — captures system audio output directly; supports 44.1 kHz, 48 kHz, 96 kHz, and 192 kHz sample rates
+- 🎛️ **ASIO support** — connect any ASIO-compatible audio interface, DJ controller (e.g., [Pioneer DJ](https://www.pioneerdj.com)/[AlphaTheta](https://alphatheta.com), [Denon DJ](https://www.denondj.com), [Numark](https://www.numark.com) etc.) or virtual ASIO driver (e.g. [ASIO4ALL](https://asio4all.org), [FlexASIO](https://github.com/dechamps/FlexASIO)) for low-latency instrument, microphone or direct output from DJ software ([Serato DJ](https://serato.com/dj), [rekordbox](https://rekordbox.com), [VirtualDJ](https://virtualdj.com)) and DAWs; selectable alongside WASAPI devices in the settings dialog
 - 🎚️ **Adjustable audio sensitivity** — boost or reduce the audio input level with Up/Down keys or the settings dialog; ranges from 0 to 15.
 - 📡 **[Spout]((https://spout.zeal.co/)) output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.); sent as a DirectX 11 shared texture via Spout interop
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
@@ -125,7 +126,7 @@ WindowHeight=720
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `Audio` | string | Friendly name of the audio device; empty/no name match = system default output |
+| `Audio` | string | Friendly name of the audio device; `[ASIO]` prefix for ASIO drivers, empty/no name match = system default output |
 | `AudioSensitivity` | 0-15 | Multiplier applied to audio input before visualization; 1 = no change |
 | `Detail` | Low / Normal / High / Extreme | Visual detail level (also written as `Quality` 0-3) |
 | `FPSLimit` | 0-240 | Target frame rate; 0 = unlimited |

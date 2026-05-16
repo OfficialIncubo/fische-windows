@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "settings_dialog.h"
 #include "spout/SpoutSender.h"
+#include "asio_capture.h"
 #include "wasapi_capture.h"
 
 #include <GLFW/glfw3.h>
@@ -23,6 +24,7 @@ AppSettings g_settings;
 bool g_pendingApply = false;
 AppSettings g_pendingSettings;
 std::unique_ptr<CFishBMC> g_visualizer;
+AsioCapture g_asioCapture;
 WasapiCapture g_audioCapture;
 SpoutSender g_spout;
 bool g_helpVisible = false;
@@ -159,6 +161,7 @@ void recreate_visualizer()
   auto [renderWidth, renderHeight] = renderer_size_from_framebuffer(framebufferWidth, framebufferHeight);
 
   g_audioCapture.Stop();
+  g_asioCapture.Stop();
   {
     g_audioCapture.LockVisualizer();
     g_visualizer.reset();
@@ -179,8 +182,18 @@ void recreate_visualizer()
     return;
   }
 
-  g_audioCapture.Start(g_visualizer.get(), g_settings.audioDevice);
-  g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
+  const std::string& dev = g_settings.audioDevice;
+  if (!dev.empty() && dev.rfind("[ASIO]", 0) == 0)
+  {
+    std::string asioName = dev.substr(7); // strip "[ASIO] "
+    g_asioCapture.Start(g_visualizer.get(), asioName);
+    g_asioCapture.SetSensitivity(g_settings.audioSensitivity);
+  }
+  else
+  {
+    g_audioCapture.Start(g_visualizer.get(), dev);
+    g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
+  }
   update_spout_state();
   g_lastFramebufferWidth = framebufferWidth;
   g_lastFramebufferHeight = framebufferHeight;
@@ -213,6 +226,7 @@ void apply_settings(const AppSettings& settings)
     g_visualizer->SetNervousMode(g_settings.nervousMode);
   apply_vsync(g_settings.vsyncMode);
   g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
+  g_asioCapture.SetSensitivity(g_settings.audioSensitivity);
   g_alwaysOnTop = g_settings.alwaysOnTop ? true : false;
   HWND hwnd = glfwGetWin32Window(g_window);
   SetWindowPos(hwnd, g_settings.alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -458,6 +472,7 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
     case GLFW_KEY_R:
       g_settings.audioSensitivity = 1.0f;
       g_audioCapture.SetSensitivity(1.0f);
+      g_asioCapture.SetSensitivity(1.0f);
       SaveSettings(g_settings);
       show_osd("Audio Sensitivity reset to 1");
       break;
@@ -471,6 +486,7 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       s = std::round(s * 100.0f) / 100.0f;  // always 2 decimal places
       s = std::clamp(s, 0.0f, 15.0f);
       g_audioCapture.SetSensitivity(s);
+      g_asioCapture.SetSensitivity(s);
       SaveSettings(g_settings);
       char buf[32];
       snprintf(buf, sizeof(buf), "Audio Sensitivity: %.2f", s);
