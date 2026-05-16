@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml)
+[![Build Status](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/OfficialIncubo/fische-windows/actions/workflows/build.yml)
 [![Latest Version](https://img.shields.io/github/v/release/OfficialIncubo/fische-windows?label=Version&color=96AFFF)](https://github.com/OfficialIncubo/fische-windows/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/OfficialIncubo/fische-windows/total?label=Total%20Downloads&color=7FDDF2)](https://github.com/OfficialIncubo/fische-windows/releases)
 [![Languages Count](https://img.shields.io/github/languages/count/OfficialIncubo/fische-windows?label=Languages&color=FFE096)](https://github.com/OfficialIncubo/fische-windows)
