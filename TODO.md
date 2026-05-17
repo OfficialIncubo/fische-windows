@@ -9,5 +9,5 @@
 
 # Uncategorized/Optional:
 - [ ] Update to GLFW 3.5 (if available)
-- [ ] ASIO Support
+- [x] ASIO Support
 - [ ] ~~Let the visualizer keep running when minimized (useful when outputting the visual with [Spout](https://spout.zeal.co))~~ (no idea/not planned)
