@@ -2,7 +2,7 @@
 [![Latest Version](https://img.shields.io/github/v/release/OfficialIncubo/fische-windows?label=Version&color=96AFFF)](https://github.com/OfficialIncubo/fische-windows/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/OfficialIncubo/fische-windows/total?label=Total%20Downloads&color=7FDDF2)](https://github.com/OfficialIncubo/fische-windows/releases)
 [![Languages Count](https://img.shields.io/github/languages/count/OfficialIncubo/fische-windows?label=Languages&color=FFE096)](https://github.com/OfficialIncubo/fische-windows)
-[![License](https://img.shields.io/github/license/OfficialIncubo/fische-windows?label=License&color=EAA3FF)](https://github.com/OfficialIncubo/fische-windows/blob/master/LICENSE.md)
+[![License](https://img.shields.io/github/license/OfficialIncubo/fische-windows?label=License&color=EAA3FF)](https://github.com/OfficialIncubo/fische-windows/blob/main/LICENSE.md)
 
 # fische for Windows
 
