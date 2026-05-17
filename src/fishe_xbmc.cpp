@@ -79,8 +79,6 @@ CFishBMC::CFishBMC(uint32_t _w, uint32_t _h, int quality, bool nervous, bool fil
   m_filemode = filePersistence;
   m_fische->nervous_mode = nervous ? 1 : 0;
   m_fische->handler = this;
-  m_fische->height = _h;
-  m_fische->width = _w;
   if (m_filemode)
   {
     m_fische->read_vectors = &read_vectors;
@@ -138,6 +136,8 @@ bool CFishBMC::Start(int channels,
 
   m_fische->audio_format = FISCHE_AUDIOFORMAT_FLOAT;
   m_fische->used_cpus = 4;
+  m_fische->height = m_size;
+  m_fische->width = 2 * m_size;
 
   if (fische_start(m_fische) != 0)
   {
