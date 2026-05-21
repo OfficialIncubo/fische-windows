@@ -157,6 +157,7 @@ GNU General Public License v2.0 or later.
 
 - Original fische engine: © 2013 Marcel Ebmer ([@maysl](https://github.com/maysl)), © 2005–2026 Team Kodi; The Kodi Foundation
 - Spout: © Lynn Jarvis ([@leadedge](https://github.com/leadedge)) — BSD-style
+- ASIO: © 2026 Steinberg Media Technologies GmbH
 - Windows port and integration: see `LICENSE.md`
 
 ---
@@ -170,9 +171,14 @@ GNU General Public License v2.0 or later.
 | [GLFW](https://www.glfw.org/) | Camilla Löwy and contributors |
 | [Spout](https://spout.zeal.co) | Lynn Jarvis ([leadedge](https://github.com/leadedge)) |
 | [BeatDrop loopback capture](https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/tree/master/audio) | Matthew van Eerde & Incubo_ |
+| [ASIO SDK](https://www.steinberg.net/developers/asiosdk-open/) | Steinberg |
 | [fische GLFW project inspiration/derived from](https://discord.com/channels/737206408482914387/1500210344621113345) | [proconsule](https://github.com/proconsule) |
 | [GLAD](https://glad.dav1d.de/) | David Herberth |
 | [GLM](https://github.com/g-truc/glm) | G-Truc Creation |
+
+<p align="center">
+<img src="src/asio/Steinberg ASIO Logo Artwork/ASIO-compatible-logo-Steinberg-TM-BW.png" alt="ASIO Logo" width="200"/>
+</p>
 
 ---
 
@@ -180,6 +186,7 @@ GNU General Public License v2.0 or later.
 
 - Original fische website (archived): https://web.archive.org/web/20200801073714/http://26elf.at/musicviz/
 - Spout: https://spout.zeal.co/
+- Steinberg: https://www.steinberg.net/
 - WASAPI loopback capture by Matthew van Eerde: https://matthewvaneerde.wordpress.com/2008/12/16/sample-wasapi-loopback-capture-record-what-you-hear/
 - BeatDrop Music Visualizer: a custom MilkDrop2 standalone visualization for Windows: https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer/
 
