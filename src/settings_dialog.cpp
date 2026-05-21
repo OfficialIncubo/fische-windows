@@ -10,12 +10,12 @@
 
 namespace
 {
-constexpr int kDialogWidth = 460;
-constexpr int kDialogHeight = 432;
+constexpr int kDialogWidth = 495;
+constexpr int kDialogHeight = 445;
 constexpr int kMargin = 10;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
-constexpr int kControlWidth = 270;
+constexpr int kControlWidth = 310;
 constexpr int kRowHeight = 32;
 
 constexpr int kAudioCombo = 1001;
@@ -192,17 +192,17 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
       create_control(hwnd, L"STATIC", L"A. Sensitivity", 0, kMargin, y + 4, kLabelWidth, 22, 0);
       HWND sensSlider = create_control(hwnd, TRACKBAR_CLASSW, L"", TBS_AUTOTICKS,
-                                      kControlLeft, y, 160, 28, kSensitivitySlider);
+                                      kControlLeft, y, 190, 28, kSensitivitySlider);
       // 0-1500 range maps to 0-15
       SendMessageW(sensSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1500));
       SendMessageW(sensSlider, TBM_SETTICFREQ, 100, 0);
       SendMessageW(sensSlider, TBM_SETPOS, TRUE,
                   static_cast<LPARAM>(state->working.audioSensitivity * 100.0f));
       state->sensLabel = create_control(hwnd, L"STATIC", L"", 0,
-                                        kControlLeft + 165, y + 4, 45, 22, kSensitivityLabel);
+                                        kControlLeft + 195, y + 4, 45, 22, kSensitivityLabel);
       update_sens_label(state, sensSlider);
       create_control(hwnd, L"BUTTON", L"Reset", 0,
-                     kControlLeft + 215, y + 2, 65, 22, kSensitivityReset);
+                     kControlLeft + 245, y + 2, 65, 22, kSensitivityReset);
       y += kRowHeight + 8;
 
       create_control(hwnd, L"STATIC", L"Detail", 0, kMargin, y + 4, kLabelWidth, 22, 0);
@@ -237,10 +237,16 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       SendMessageW(fpsSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 240));
       SendMessageW(fpsSlider, TBM_SETTICFREQ, 30, 0);
       SendMessageW(fpsSlider, TBM_SETPOS, TRUE, std::clamp(state->working.fpsLimit, 0, 240));
-      state->fpsLabel = create_control(hwnd, L"STATIC", L"", 0, kControlLeft + 165, y + 4, 45, 22, kFpsLabel);
+      state->fpsLabel = create_control(hwnd, L"STATIC", L"", 0, kControlLeft + 165, y + 4, 75, 22, kFpsLabel);
       update_fps_label(state, fpsSlider);
-      create_control(hwnd, L"BUTTON", L"Default", 0, kControlLeft + 215, y + 2, 65, 22, kFpsReset);
-      y += kRowHeight + 8;
+      create_control(hwnd, L"BUTTON", L"Default", 0, kControlLeft + 245, y + 2, 65, 22, kFpsReset);
+      y += kRowHeight + 4;
+
+      create_control(hwnd, L"STATIC", L"", SS_ETCHEDHORZ, kMargin, y + 4, kDialogWidth - kMargin * 4, 2, 0);
+      y += 12;
+
+      create_control(hwnd, L"STATIC", L"Options", 0, kMargin, y + 4, kLabelWidth, 22, 0);
+      y += 4;
 
       HWND nervous = create_control(hwnd, L"BUTTON", L"Nervous mode", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
                                     kNervousCheck);
