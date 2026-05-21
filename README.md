@@ -76,7 +76,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 |-------------|---------|
 | OS          | Windows 7 or later |
 | GPU         | OpenGL 3.2 Core |
-| CPU         | Any 32-bit or 64-bit x86-compatible processor |
+| CPU         | Any 32-bit or 64-bit compatible processor |
 | Audio       | Any WASAPI-compatible output device |
 | RAM         | 128 MB |
 | Spout       | Optional — [Spout](https://spout.zeal.co/) for sending visual renderer |
