@@ -14,6 +14,7 @@ Install the required vcpkg packages (one-time):
 
 ```bat
 C:\vcpkg\vcpkg.exe install glfw3:x64-windows-static glm:x64-windows-static
+C:\vcpkg\vcpkg.exe install glfw3:x86-windows-static glm:x86-windows-static
 ```
 
 ---
@@ -27,17 +28,32 @@ build-vs2026.cmd
 ```
 
 The script:
-1. Activates the VS 2026 x64 developer environment
-2. Configures CMake with NMake Makefiles and the vcpkg toolchain
-3. Builds in Release mode
+1. Activates the VS 2026 x64 and x86 developer environments
+2. Configures CMake with NMake Makefiles and the matching vcpkg triplet
+3. Builds separate Release executables
 
-Output: `build-nmake-static\fische.exe`
+Outputs:
+
+```text
+dist\fische-x64.exe
+dist\fische-x86.exe
+```
+
+To build only one architecture:
+
+```bat
+build-vs2026.cmd x64
+build-vs2026.cmd x86
+```
 
 ---
 
 ## Distributing
 
-Copy ```fische.exe``` from build-nmake-static to any folder you want. 
+Copy the executable for your PC to any folder you want:
+
+- `dist\fische-x64.exe` for 64-bit Windows
+- `dist\fische-x86.exe` for 32-bit Windows
 
 No other library and runtime files are required. All other dependencies are linked statically.
 
@@ -49,6 +65,7 @@ CMake embeds absolute paths in `CMakeCache.txt`. If you move the source folder t
 
 ```bat
 rmdir /s /q build-nmake-static
+rmdir /s /q build-nmake-static-x86
 build-vs2026.cmd
 ```
 
@@ -56,7 +73,7 @@ build-vs2026.cmd
 
 ## GitHub Actions
 
-A workflow file is provided at `.github/workflows/build.yml`. It builds automatically on every push and pull request to `main`, and produces a `fische-windows` artifact containing `fische.exe`.
+A workflow file is provided at `.github/workflows/build.yml`. It builds automatically on every push and pull request to `main`, and produces separate x64 and x86 artifacts containing `fische-x64.exe` and `fische-x86.exe`.
 
 To trigger a release build with a downloadable artifact, push a tag:
 

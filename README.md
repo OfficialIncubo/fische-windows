@@ -76,7 +76,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 |-------------|---------|
 | OS          | Windows 7 or later |
 | GPU         | OpenGL 3.2 Core |
-| CPU         | Any 64-bit processor (x64) |
+| CPU         | Any 32-bit or 64-bit x86-compatible processor |
 | Audio       | Any WASAPI-compatible output device |
 | RAM         | 128 MB |
 | Spout       | Optional — [Spout](https://spout.zeal.co/) for sending visual renderer |
@@ -85,8 +85,8 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 
 ## Running
 
-1. Copy `fische.exe` to any folder you want.
-2. Double-click `fische.exe` to run.
+1. Copy the executable for your PC to any folder you want: `fische-x64.exe` for 64-bit Windows, or `fische-x86.exe` for 32-bit Windows.
+2. Double-click it to run.
 
 On the first run, `settings.ini` is created next to the executable with default settings. Audio capture starts automatically using the default output device.
 

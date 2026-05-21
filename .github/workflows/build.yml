@@ -13,11 +13,21 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.manifest_mode == 'ON' && 'with vcpkg''s manifest mode' || 'without vcpkg''s manifest mode' }}
+    name: Build ${{ matrix.arch }} ${{ matrix.manifest_mode == 'ON' && 'with vcpkg''s manifest mode' || 'without vcpkg''s manifest mode' }}
     runs-on: windows-latest
     strategy:
       matrix:
         manifest_mode: ['ON', 'OFF']
+        arch: ['x64', 'x86']
+        include:
+          - arch: x64
+            cmake_arch: x64
+            triplet: x64-windows-static
+            output_name: fische-x64.exe
+          - arch: x86
+            cmake_arch: Win32
+            triplet: x86-windows-static
+            output_name: fische-x86.exe
 
     steps:
       - name: Checkout
@@ -30,15 +40,15 @@ jobs:
           path: |
             C:\vcpkg\installed
             vcpkg_installed
-          key: vcpkg-x64-windows-static-manifest-${{ matrix.manifest_mode }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
-          restore-keys: vcpkg-x64-windows-static-manifest-${{ matrix.manifest_mode }}-
+          key: vcpkg-${{ matrix.triplet }}-manifest-${{ matrix.manifest_mode }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: vcpkg-${{ matrix.triplet }}-manifest-${{ matrix.manifest_mode }}-
 
       - name: Update vcpkg baseline
         run: vcpkg x-update-baseline
 
       - name: Install dependencies via vcpkg (Manifest Mode)
         if: matrix.manifest_mode == 'ON'
-        run: vcpkg install --triplet x64-windows-static
+        run: vcpkg install --triplet ${{ matrix.triplet }}
 
       - name: Install dependencies via vcpkg (Classic Mode)
         if: matrix.manifest_mode == 'OFF'
@@ -53,30 +63,31 @@ jobs:
           # 3. Install parsed dependencies globally (Classic Mode)
           if ($deps) {
             $depList = $deps -join " "
-            Invoke-Expression "vcpkg install $depList --triplet x64-windows-static"
+            Invoke-Expression "vcpkg install $depList --triplet ${{ matrix.triplet }}"
           }
         shell: pwsh
 
       - name: Configure CMake
         run: >
-          cmake -B build 
+          cmake -B build-${{ matrix.arch }}
+          -A ${{ matrix.cmake_arch }}
           -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake 
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static 
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
           -DVCPKG_MANIFEST_MODE=${{ matrix.manifest_mode }}
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build-${{ matrix.arch }} --config Release
 
       - name: Assemble artifact
         run: |
           mkdir dist
-          copy build\Release\fische.exe dist\
+          copy build-${{ matrix.arch }}\Release\fische.exe dist\${{ matrix.output_name }}
         shell: cmd
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: fische-windows-manifest-${{ matrix.manifest_mode }}
+          name: fische-windows-${{ matrix.arch }}-manifest-${{ matrix.manifest_mode }}
           path: dist/
 
       # - name: Upload release asset (on tag)

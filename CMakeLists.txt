@@ -16,6 +16,7 @@ if(NOT glm_FOUND)
       "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include"
       "C:/vcpkg/installed/${VCPKG_TARGET_TRIPLET}/include"
       "C:/vcpkg/installed/x64-windows-static/include"
+      "C:/vcpkg/installed/x86-windows-static/include"
     REQUIRED)
 endif()
 

@@ -1,6 +1,8 @@
 # build artifacts
 build/
 build-nmake-static/
+build-nmake-static-x86/
+dist/
 visualization.*/addon.xml
 
 # commonly used editors
