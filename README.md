@@ -57,6 +57,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 - 📡 **[Spout]((https://spout.zeal.co/)) output** — share the visualization as a texture with any Spout-compatible app ([OBS](https://obsproject.com) via [Spout Plug-in](https://github.com/Off-World-Live/obs-spout2-plugin), [SpoutCam](https://github.com/leadedge/SpoutCam), [Resolume](https://www.resolume.com), [NestDrop](https://nestimmersion.ca/nestdrop.php), [TouchDesigner](https://derivative.ca) etc.); sent as a DirectX 11 shared texture via Spout interop
 - ⚙️ **Settings dialog** — configure audio device, detail level, FPS limit, VSync, Spout and more; all saved to `settings.ini`
 - 🖼️ **Fullscreen support** — toggle at any time with `F` or with `Double Left Click`
+- 👁️ **Window Visibility** — hide visual window to taskbar tray by pressing `S` to keep it running smoothly in the background without taking up desktop space. Useful when sharing the visual with [Spout]((https://spout.zeal.co/)) with a clutter-free hidden window.
 - 🧠 **Nervous mode** — rapid-animation style toggle
 - ⏸️ **Pause / unpause**
 - 💾 **Vector file persistence** — optionally cache computed vector fields to `vectors/` for faster startup
@@ -101,6 +102,7 @@ On the first run, `settings.ini` is created next to the executable with default 
 | `F` (or `Double Left Click`) | Toggle fullscreen |
 | `T` | Toggle always on top |
 | `N` | Toggle nervous mode |
+| `S` | Hide visual window |
 | `O` (or `Right Click`) | Open settings dialog |
 | `P` | Pause / unpause |
 | `Z` | Toggle Spout output |
@@ -128,6 +130,7 @@ VSync=Off
 AlwaysOnTop=false
 WindowWidth=1280
 WindowHeight=720
+HideWindow=false
 ```
 
 | Key | Type | Description |
@@ -142,6 +145,7 @@ WindowHeight=720
 | `VSync` | Off / On / Adaptive | VSync mode; Adaptive mode uses `glfwSwapInterval(-1)`, which reduces tearing without hard locking the frame rate |
 | `AlwaysOnTop` | true / false | Keep the visual window above all other windows |
 | `WindowWidth` / `WindowHeight` | integer | Last window size; restored on next launch |
+| `HideWindow` | true / false | Shows/hides the visual render window at startup |
 
 ---
 

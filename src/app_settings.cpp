@@ -156,6 +156,8 @@ AppSettings LoadSettings()
     settings.windowWidth = parse_int(it->second, settings.windowWidth, 320, 7680);
   if (auto it = values.find("windowheight"); it != values.end())
     settings.windowHeight = parse_int(it->second, settings.windowHeight, 240, 4320);
+  if (auto it = values.find("hidewindow"); it != values.end())
+    settings.hideWindow = parse_bool(it->second, settings.hideWindow);
 
   return settings;
 }
@@ -181,6 +183,7 @@ void SaveSettings(const AppSettings& settings)
   file << "AlwaysOnTop=" << (settings.alwaysOnTop ? "true" : "false") << "\n";
   file << "WindowWidth=" << std::max(settings.windowWidth, 320) << "\n";
   file << "WindowHeight=" << std::max(settings.windowHeight, 240) << "\n";
+  file << "HideWindow=" << (settings.hideWindow ? "true" : "false") << "\n";
 }
 
 std::wstring Utf8ToWide(const std::string& text)

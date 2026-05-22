@@ -9,6 +9,7 @@ struct AppSettings
   int quality = 2;
   int fpsLimit = 60;
   bool alwaysOnTop = false;
+  bool hideWindow = false;
   bool nervousMode = false;
   bool useFilePersistence = false;
   bool spoutEnabled = false;

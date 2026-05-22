@@ -9,6 +9,7 @@
 
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#include <shellapi.h>
 
 #include <algorithm>
 #include <chrono>
@@ -39,6 +40,21 @@ bool g_cursorVisible = true;
 bool g_spoutReady = false;
 bool g_paused = false;
 bool g_openSettings = false;
+bool g_windowHidden = false;
+NOTIFYICONDATAW g_trayIcon = {};
+bool g_trayAdded = false;
+
+// Custom window message for tray icon callbacks
+constexpr UINT WM_TRAY_ICON = WM_APP + 1;
+// Tray icon ID
+constexpr UINT TRAY_ICON_ID = 1;
+// Tray context menu commands
+constexpr UINT TRAY_CMD_SHOW     = 9001;
+constexpr UINT TRAY_CMD_SETTINGS = 9002;
+constexpr UINT TRAY_CMD_EXIT     = 9003;
+
+// Original WNDPROC for subclassing the GLFW window
+WNDPROC g_origWndProc = nullptr;
 bool g_fullscreen = false;
 bool g_alwaysOnTop = false;
 int g_windowedX = 100;
@@ -52,6 +68,8 @@ int g_osdTextH = 0;
 std::chrono::steady_clock::time_point g_lastResizeChange;
 std::chrono::steady_clock::time_point g_messageUntil;
 
+void hide_to_tray();
+void show_from_tray();
 extern "C"
 {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
@@ -232,6 +250,11 @@ void apply_settings(const AppSettings& settings)
   SetWindowPos(hwnd, g_settings.alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
   if (!g_fullscreen)
     glfwSetWindowSize(g_window, g_settings.windowWidth, g_settings.windowHeight);
+  // Sync hide/show state from settings dialog
+  if (g_settings.hideWindow && !g_windowHidden)
+    hide_to_tray();
+  else if (!g_settings.hideWindow && g_windowHidden)
+    show_from_tray();
   recreate_visualizer();
 }
 
@@ -294,6 +317,7 @@ void draw_help_screen(int fw, int fh)
     "F              Toggle fullscreen",
     "T              Toggle always on top",
     "N              Toggle nervous mode",
+    "S              Hide visual window",
     "O/RClick       Open settings",
     "P              Pause / unpause",
     "Z              Toggle Spout output",
@@ -418,6 +442,122 @@ void set_always_on_top(bool enabled)
   SaveSettings(g_settings);
 }
 
+// ---- System Tray ----
+
+void add_tray_icon(HWND hwnd)
+{
+  if (g_trayAdded)
+    return;
+  ZeroMemory(&g_trayIcon, sizeof(g_trayIcon));
+  g_trayIcon.cbSize           = sizeof(g_trayIcon);
+  g_trayIcon.hWnd             = hwnd;
+  g_trayIcon.uID              = TRAY_ICON_ID;
+  g_trayIcon.uFlags           = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+  g_trayIcon.uCallbackMessage = WM_TRAY_ICON;
+  g_trayIcon.hIcon            = (HICON)LoadImageW(GetModuleHandleW(nullptr),
+                                                   MAKEINTRESOURCEW(1),
+                                                   IMAGE_ICON, 0, 0,
+                                                   LR_DEFAULTSIZE | LR_SHARED);
+  if (!g_trayIcon.hIcon)
+    g_trayIcon.hIcon = LoadIconW(nullptr, MAKEINTRESOURCEW(IDI_APPLICATION));
+  wcsncpy_s(g_trayIcon.szTip, L"fische", _TRUNCATE);
+  Shell_NotifyIconW(NIM_ADD, &g_trayIcon);
+  g_trayAdded = true;
+}
+
+void remove_tray_icon()
+{
+  if (!g_trayAdded)
+    return;
+  Shell_NotifyIconW(NIM_DELETE, &g_trayIcon);
+  g_trayAdded = false;
+}
+
+void hide_to_tray()
+{
+  if (g_windowHidden)
+    return;
+  HWND hwnd = glfwGetWin32Window(g_window);
+  add_tray_icon(hwnd);
+  ShowWindow(hwnd, SW_HIDE);
+  g_windowHidden = true;
+  g_settings.hideWindow = true;
+}
+
+void show_from_tray()
+{
+  if (!g_windowHidden)
+    return;
+  HWND hwnd = glfwGetWin32Window(g_window);
+  ShowWindow(hwnd, SW_SHOW);
+  SetForegroundWindow(hwnd);
+  remove_tray_icon();
+  g_windowHidden = false;
+  g_settings.hideWindow = false;
+}
+
+void show_tray_context_menu(HWND hwnd)
+{
+  HMENU menu = CreatePopupMenu();
+  AppendMenuW(menu, MF_STRING, TRAY_CMD_SHOW,     L"Show visual window");
+  AppendMenuW(menu, MF_STRING, TRAY_CMD_SETTINGS, L"Settings");
+  AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+  AppendMenuW(menu, MF_STRING, TRAY_CMD_EXIT,     L"Exit");
+
+  // Required so the menu dismisses when clicking elsewhere
+  SetForegroundWindow(hwnd);
+
+  POINT pt;
+  GetCursorPos(&pt);
+  int cmd = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, hwnd, nullptr);
+  DestroyMenu(menu);
+
+  switch (cmd)
+  {
+    case TRAY_CMD_SHOW:
+      show_from_tray();
+      break;
+    case TRAY_CMD_SETTINGS:
+      //show_from_tray();
+      if (!g_openSettings)
+      {
+        g_openSettings = true;
+        std::thread([]() {
+          glfwGetWindowSize(g_window, &g_settings.windowWidth, &g_settings.windowHeight);
+          ShowSettingsDialog(glfwGetWin32Window(g_window), g_settings, [](const AppSettings& settings) {
+            g_pendingSettings = settings;
+            g_pendingApply = true;
+          });
+          g_openSettings = false;
+        }).detach();
+      }
+      break;
+    case TRAY_CMD_EXIT:
+      glfwSetWindowShouldClose(g_window, GLFW_TRUE);
+      //show_from_tray(); // unhide so GLFW close is processed properly - uncomment if needed
+      break;
+  }
+}
+
+// Subclassed window procedure to intercept tray messages
+LRESULT CALLBACK tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  if (msg == WM_TRAY_ICON)
+  {
+    switch (LOWORD(lParam))
+    {
+      case WM_LBUTTONUP:
+        show_from_tray();
+        break;
+      case WM_RBUTTONUP:
+        show_tray_context_menu(hwnd);
+        break;
+    }
+    return 0;
+  }
+  return CallWindowProcW(g_origWndProc, hwnd, msg, wParam, lParam);
+}
+
 void key_callback(GLFWwindow* window, int key, int, int action, int)
 {
   if (action != GLFW_PRESS)
@@ -437,6 +577,9 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
     case GLFW_KEY_T:
       set_always_on_top(!g_alwaysOnTop);
       show_osd(g_alwaysOnTop ? "Always on top ON" : "Always on top OFF");
+      break;
+    case GLFW_KEY_S:
+      hide_to_tray();
       break;
     case GLFW_KEY_N:
       g_settings.nervousMode = !g_settings.nervousMode;
@@ -654,6 +797,14 @@ int main(int, char**)
     SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
   }
 
+  // Subclass the GLFW window so tray notification messages are handled
+  g_origWndProc = reinterpret_cast<WNDPROC>(
+      SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(tray_wnd_proc)));
+
+  // Restore hidden state from settings (e.g. app was saved while hidden)
+  if (g_settings.hideWindow)
+    hide_to_tray();
+
   timeBeginPeriod(1);
 
   while (!glfwWindowShouldClose(g_window))
@@ -684,16 +835,28 @@ int main(int, char**)
       int fw, fh;
       glfwGetFramebufferSize(g_window, &fw, &fh);
 
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
-      g_visualizer->Render();
+      if (!g_windowHidden)
+      {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        g_visualizer->Render();
 
-      if (g_helpVisible)
-        draw_help_screen(fw, fh);
+        if (g_helpVisible)
+          draw_help_screen(fw, fh);
 
-      draw_osd(fw, fh);
+        draw_osd(fw, fh);
 
-      glfwSwapBuffers(g_window);
+        glfwSwapBuffers(g_window);
+      }
+      else
+      {
+        // Window is hidden: still tick fische and send Spout
+        // Also clear the buffer to prevent creating ghosting trails
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        g_visualizer->Render();
+        glfwSwapBuffers(g_window);
+      }
     }
 
     glfwPollEvents();
@@ -704,6 +867,8 @@ int main(int, char**)
   timeEndPeriod(1);
 
   glfwGetWindowSize(g_window, &g_settings.windowWidth, &g_settings.windowHeight);
+  // Don't persist the hidden state - always start visible on next launch - uncomment if needed
+  //g_settings.hideWindow = false;
   SaveSettings(g_settings);
 
   g_audioCapture.Stop();
@@ -715,6 +880,7 @@ int main(int, char**)
   }
 
   if (g_font) { DeleteObject(g_font); g_font = nullptr; }
+  remove_tray_icon();
   glfwDestroyWindow(g_window);
   glfwTerminate();
   return 0;

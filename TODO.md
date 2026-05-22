@@ -4,7 +4,7 @@
 - [x] Implement adaptive VSync; replaces `Enable VSync` checkbox with a dropdown and 3 options: On, Off and Adaptive.
 
 # For version 2.3:
-- [ ] Implement show/hide window/render feature
+- [x] Implement show/hide window/render feature
 - [ ] Window-independent (fixed) Spout output; with fixed button toggle. If it's enabled, it also enables the typing box for fixed Spout output resolution, else it makes untypable if you disabled fixed Spout output. (+ `S` hotkey)
 
 # Uncategorized/Optional:

@@ -11,7 +11,7 @@
 namespace
 {
 constexpr int kDialogWidth = 495;
-constexpr int kDialogHeight = 445;
+constexpr int kDialogHeight = 473;
 constexpr int kMargin = 10;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
@@ -34,6 +34,7 @@ constexpr int kAlwaysOnTopCheck = 1013;
 constexpr int kWidthEdit  = 1014;
 constexpr int kHeightEdit = 1015;
 constexpr int kFpsReset = 1016;
+constexpr int kHideWindowCheck = 1017;
 
 struct DialogState
 {
@@ -160,6 +161,7 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   state->working.spoutEnabled = SendMessageW(GetDlgItem(hwnd, kSpoutCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.vsyncMode = std::clamp(static_cast<int>(SendMessageW(GetDlgItem(hwnd, kVSyncCombo), CB_GETCURSEL, 0, 0)), 0, 2);
   state->working.alwaysOnTop = SendMessageW(GetDlgItem(hwnd, kAlwaysOnTopCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
+  state->working.hideWindow  = SendMessageW(GetDlgItem(hwnd, kHideWindowCheck),  BM_GETCHECK, 0, 0) == BST_CHECKED;
 
   *state->settings = state->working;
   SaveSettings(*state->settings);
@@ -266,6 +268,11 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       HWND alwaysontop = create_control(hwnd, L"BUTTON", L"Always on top", BS_AUTOCHECKBOX, kControlLeft, y, 180, 22,
                                         kAlwaysOnTopCheck);
       SendMessageW(alwaysontop, BM_SETCHECK, state->working.alwaysOnTop ? BST_CHECKED : BST_UNCHECKED, 0);
+      y += 28;
+
+      HWND hidewin = create_control(hwnd, L"BUTTON", L"Hide visual window", BS_AUTOCHECKBOX, kControlLeft, y, 210, 22,
+                                    kHideWindowCheck);
+      SendMessageW(hidewin, BM_SETCHECK, state->working.hideWindow ? BST_CHECKED : BST_UNCHECKED, 0);
 
       create_control(hwnd, L"BUTTON", L"OK", BS_DEFPUSHBUTTON, kDialogWidth - 252, kDialogHeight - 78, 70, 28, IDOK);
       create_control(hwnd, L"BUTTON", L"Apply", 0, kDialogWidth - 172, kDialogHeight - 78, 70, 28, kApplyButton);
