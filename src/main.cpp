@@ -52,6 +52,9 @@ constexpr UINT TRAY_ICON_ID = 1;
 constexpr UINT TRAY_CMD_SHOW     = 9001;
 constexpr UINT TRAY_CMD_SETTINGS = 9002;
 constexpr UINT TRAY_CMD_EXIT     = 9003;
+constexpr UINT TRAY_CMD_PAUSE    = 9004;
+constexpr UINT TRAY_CMD_SPOUT    = 9005;
+constexpr UINT TRAY_CMD_NERVOUS  = 9006;
 
 // Original WNDPROC for subclassing the GLFW window
 WNDPROC g_origWndProc = nullptr;
@@ -500,8 +503,11 @@ void show_tray_context_menu(HWND hwnd)
 {
   HMENU menu = CreatePopupMenu();
   AppendMenuW(menu, MF_STRING, TRAY_CMD_SHOW,     L"Show visual window");
-  AppendMenuW(menu, MF_STRING, TRAY_CMD_SETTINGS, L"Settings");
   AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+  AppendMenuW(menu, MF_STRING | (g_settings.spoutEnabled ? MF_CHECKED : MF_UNCHECKED), TRAY_CMD_SPOUT, L"Spout output");
+  AppendMenuW(menu, MF_STRING | (g_settings.nervousMode ? MF_CHECKED : MF_UNCHECKED), TRAY_CMD_NERVOUS, L"Nervous mode");
+  AppendMenuW(menu, MF_STRING | (g_paused ? MF_CHECKED : MF_UNCHECKED), TRAY_CMD_PAUSE, L"Pause visualizer");
+  AppendMenuW(menu, MF_STRING, TRAY_CMD_SETTINGS, L"Settings");
   AppendMenuW(menu, MF_STRING, TRAY_CMD_EXIT,     L"Exit");
 
   // Required so the menu dismisses when clicking elsewhere
@@ -516,6 +522,21 @@ void show_tray_context_menu(HWND hwnd)
   {
     case TRAY_CMD_SHOW:
       show_from_tray();
+      break;
+    case TRAY_CMD_SPOUT:
+      g_settings.spoutEnabled = !g_settings.spoutEnabled;
+      update_spout_state();
+      SaveSettings(g_settings);
+      break;
+    case TRAY_CMD_NERVOUS:
+      g_settings.nervousMode = !g_settings.nervousMode;
+      if (g_visualizer)
+        g_visualizer->SetNervousMode(g_settings.nervousMode);
+      SaveSettings(g_settings);
+      break;
+    case TRAY_CMD_PAUSE:
+      g_paused = !g_paused;
+      glfwSetWindowTitle(g_window, g_paused ? "fische - PAUSED" : "fische");
       break;
     case TRAY_CMD_SETTINGS:
       //show_from_tray();
