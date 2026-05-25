@@ -79,7 +79,7 @@ https://github.com/user-attachments/assets/0ec0343a-4ed2-4d37-a467-74acdff5ea09
 | Runtime     | [Microsoft Visual C++ Redistributable 2015-2022](https://www.microsoft.com/en-us/download/details.aspx?id=52685) ([Mirror](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)) or [an optional All-In-One package](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/) |
 | GPU         | OpenGL 3.2 Core |
 | CPU         | Any 32-bit or 64-bit compatible processor |
-| Audio       | Any WASAPI-compatible output device |
+| Audio       | Any WASAPI-compatible output device or ASIO driver |
 | RAM         | 128 MB |
 | Spout       | Optional — [Spout](https://spout.zeal.co/) for sending visual renderer |
 
