@@ -11,7 +11,7 @@
 namespace
 {
 constexpr int kDialogWidth = 495;
-constexpr int kDialogHeight = 473;
+constexpr int kDialogHeight = 501;
 constexpr int kMargin = 10;
 constexpr int kLabelWidth = 130;
 constexpr int kControlLeft = 155;
@@ -35,6 +35,9 @@ constexpr int kWidthEdit  = 1014;
 constexpr int kHeightEdit = 1015;
 constexpr int kFpsReset = 1016;
 constexpr int kHideWindowCheck = 1017;
+constexpr int kFixedSpoutCheck   = 1018;
+constexpr int kFixedSpoutWidthEdit  = 1019;
+constexpr int kFixedSpoutHeightEdit = 1020;
 
 struct DialogState
 {
@@ -153,12 +156,17 @@ void apply_settings_from_controls(HWND hwnd, DialogState* state)
   state->working.windowWidth = std::clamp(_wtoi(buf), 320, 7680);
   GetWindowTextW(GetDlgItem(hwnd, kHeightEdit), buf, 32);
   state->working.windowHeight = std::clamp(_wtoi(buf), 240, 4320);
+  GetWindowTextW(GetDlgItem(hwnd, kFixedSpoutWidthEdit),  buf, 32);
+  state->working.fixedSpoutWidth  = std::clamp(_wtoi(buf), 320, 7680);
+  GetWindowTextW(GetDlgItem(hwnd, kFixedSpoutHeightEdit), buf, 32);
+  state->working.fixedSpoutHeight = std::clamp(_wtoi(buf), 240, 4320);
 
   HWND fps = GetDlgItem(hwnd, kFpsSlider);
   state->working.fpsLimit = std::clamp(static_cast<int>(SendMessageW(fps, TBM_GETPOS, 0, 0)), 0, 240);
   state->working.nervousMode = SendMessageW(GetDlgItem(hwnd, kNervousCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.useFilePersistence = SendMessageW(GetDlgItem(hwnd, kPersistenceCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.spoutEnabled = SendMessageW(GetDlgItem(hwnd, kSpoutCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
+  state->working.fixedSpoutEnabled = SendMessageW(GetDlgItem(hwnd, kFixedSpoutCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.vsyncMode = std::clamp(static_cast<int>(SendMessageW(GetDlgItem(hwnd, kVSyncCombo), CB_GETCURSEL, 0, 0)), 0, 2);
   state->working.alwaysOnTop = SendMessageW(GetDlgItem(hwnd, kAlwaysOnTopCheck), BM_GETCHECK, 0, 0) == BST_CHECKED;
   state->working.hideWindow  = SendMessageW(GetDlgItem(hwnd, kHideWindowCheck),  BM_GETCHECK, 0, 0) == BST_CHECKED;
@@ -232,6 +240,26 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
       SetWindowTextW(widthEdit,  std::to_wstring(state->working.windowWidth).c_str());
       SetWindowTextW(heightEdit, std::to_wstring(state->working.windowHeight).c_str());
+      y += kRowHeight + 4;
+
+      create_control(hwnd, L"STATIC", L"Spout resol.", 0, kMargin, y + 4, kLabelWidth, 22, 0);
+      HWND fixedW = create_control(hwnd, L"EDIT", L"", ES_NUMBER | WS_BORDER,
+                                    kControlLeft, y, 70, 22, kFixedSpoutWidthEdit);
+      create_control(hwnd, L"STATIC", L"\u00D7", 0, kControlLeft + 76, y + 4, 12, 22, 0);
+      HWND fixedH = create_control(hwnd, L"EDIT", L"", ES_NUMBER | WS_BORDER,
+                                    kControlLeft + 94, y, 70, 22, kFixedSpoutHeightEdit);
+      HWND fixedBtn = create_control(hwnd, L"BUTTON", L"Fixed", BS_AUTOCHECKBOX,
+                                      kControlLeft + 175, y + 2, 70, 20, kFixedSpoutCheck);
+
+      SetWindowTextW(fixedW, std::to_wstring(state->working.fixedSpoutWidth).c_str());
+      SetWindowTextW(fixedH, std::to_wstring(state->working.fixedSpoutHeight).c_str());
+      SendMessageW(fixedBtn, BM_SETCHECK, state->working.fixedSpoutEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
+
+      // Enable/disable edit boxes based on current state
+      bool fixedOn = state->working.fixedSpoutEnabled;
+      EnableWindow(fixedW, fixedOn);
+      EnableWindow(fixedH, fixedOn);
+
       y += kRowHeight + 4;
 
       create_control(hwnd, L"STATIC", L"Speed", 0, kMargin, y + 4, kLabelWidth, 22, 0);
@@ -308,6 +336,14 @@ LRESULT CALLBACK dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
           HWND slider = GetDlgItem(hwnd, kFpsSlider);
           SendMessageW(slider, TBM_SETPOS, TRUE, 60);
           update_fps_label(state, slider);
+          return 0;
+        }
+        case kFixedSpoutCheck:
+        {
+          bool checked = SendMessageW(GetDlgItem(hwnd, kFixedSpoutCheck),
+                                      BM_GETCHECK, 0, 0) == BST_CHECKED;
+          EnableWindow(GetDlgItem(hwnd, kFixedSpoutWidthEdit),  checked);
+          EnableWindow(GetDlgItem(hwnd, kFixedSpoutHeightEdit), checked);
           return 0;
         }
         case IDCANCEL:

@@ -179,6 +179,8 @@ void CFishBMC::Stop()
   if (!m_startOK)
     return;
 
+  DestroyFixedFbo();
+
   glDeleteTextures(1, &m_texture);
 
 
@@ -297,7 +299,10 @@ void CFishBMC::Render()
   finish_render();
   // Make sure all drawing commands are complete before Spout copies the frame.
   glFinish();
-  SendFrame(Sender);
+  if (m_useFixedSpout && m_fixedFboReady)
+    SendFixedFrame(Sender);
+  else
+    SendFrame(Sender);
 
 }
 
@@ -500,6 +505,99 @@ std::filesystem::path CFishBMC::vector_cache_path() const
   return dir /
          ("fische-vectors-" + std::to_string(m_fische->width) + "x" +
           std::to_string(m_fische->height) + ".bin");
+}
+
+void CFishBMC::SendFixedFrame(SpoutSender* sender)
+{
+  if (!sender || !m_fixedFboReady || !m_startOK)
+    return;
+
+  // Save current GL state
+  GLint prevFbo = 0;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo);
+  GLint prevViewport[4];
+  glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+  // Render into fixed FBO
+  glBindFramebuffer(GL_FRAMEBUFFER, m_fixedFbo);
+  glViewport(0, 0, m_fixedWidth, m_fixedHeight);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  start_render();
+
+  int n_Y = 8;
+  int n_X = std::max(1, static_cast<int>(m_aspect * 8 + 0.5));
+  double quad_width  = 4.0 / n_X;
+  double quad_height = 4.0 / n_Y;
+  double tex_width   = m_texright - m_texleft;
+
+  for (double X = 0; X < n_X; X += 1)
+  {
+    for (double Y = 0; Y < n_Y; Y += 1)
+    {
+      double center_x  = -2 + (X + 0.5) * 4 / n_X;
+      double center_y  = -2 + (Y + 0.5) * 4 / n_Y;
+      double tex_left  = m_texleft + tex_width * X / n_X;
+      double tex_right = m_texleft + tex_width * (X + 1) / n_X;
+      double tex_top   = Y / n_Y;
+      double tex_bottom = (Y + 1) / n_Y;
+      double angle = (m_angle - m_lastangle) * 4 - (X + Y * n_X) / (n_X * n_Y) * 360;
+      angle = std::clamp(angle, 0.0, 360.0);
+      int quad_count = static_cast<int>(X) * n_Y + static_cast<int>(Y);
+      if (quad_count < static_cast<int>(m_axis.size()))
+        textured_quad(center_x, center_y, angle, m_axis[quad_count],
+                      quad_width, quad_height,
+                      tex_left, tex_right, tex_top, tex_bottom);
+    }
+  }
+
+  finish_render();
+  glFinish();
+
+  // Send fixed FBO to Spout
+  sender->SendFbo(m_fixedFbo, static_cast<unsigned>(m_fixedWidth),
+                              static_cast<unsigned>(m_fixedHeight), true);
+
+  // Restore previous GL state
+  glBindFramebuffer(GL_FRAMEBUFFER, prevFbo);
+  glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+}
+
+void CFishBMC::SetupFixedFbo(int w, int h)
+{
+  DestroyFixedFbo();
+
+  m_fixedWidth  = w;
+  m_fixedHeight = h;
+
+  glGenFramebuffers(1, &m_fixedFbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_fixedFbo);
+
+  glGenTextures(1, &m_fixedTexture);
+  glBindTexture(GL_TEXTURE_2D, m_fixedTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fixedTexture, 0);
+
+  glGenRenderbuffers(1, &m_fixedRbo);
+  glBindRenderbuffer(GL_RENDERBUFFER, m_fixedRbo);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fixedRbo);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  m_fixedFboReady = (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
+}
+
+void CFishBMC::DestroyFixedFbo()
+{
+  if (m_fixedFbo)     { glDeleteFramebuffers(1,  &m_fixedFbo);     m_fixedFbo     = 0; }
+  if (m_fixedTexture) { glDeleteTextures(1,      &m_fixedTexture); m_fixedTexture = 0; }
+  if (m_fixedRbo)     { glDeleteRenderbuffers(1, &m_fixedRbo);     m_fixedRbo     = 0; }
+  m_fixedFboReady = false;
 }
 
 void CFishBMC::write_vectors(void* handler, const void* data, size_t bytes)

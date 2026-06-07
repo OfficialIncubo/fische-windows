@@ -13,10 +13,13 @@ struct AppSettings
   bool nervousMode = false;
   bool useFilePersistence = false;
   bool spoutEnabled = false;
+  bool fixedSpoutEnabled = false;
   int vsyncMode = 0; // 0 = Off, 1 = On, 2 = Adaptive
   float audioSensitivity = 1.0f;
   int windowWidth = 1280;
   int windowHeight = 720;
+  int fixedSpoutWidth = 1920;
+  int fixedSpoutHeight = 1080;
 };
 
 std::filesystem::path GetExecutableDirectory();

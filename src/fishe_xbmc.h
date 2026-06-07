@@ -49,8 +49,12 @@ public:
   void SetNervousMode(bool enabled);
   void OnCompiledAndLinked();
   void SendFrame(SpoutSender* sender);
+  void SendFixedFrame(SpoutSender* sender);
+  void SetupFixedFbo(int w, int h);
+  void DestroyFixedFbo();
 
   SpoutSender *Sender;
+  bool m_useFixedSpout = false;
 
   GLFWwindow *window;
   GLuint m_texture = 0;
@@ -96,6 +100,9 @@ private:
   GLuint m_vertexVBO[2] = {0};
   GLuint m_indexVBO = 0;
 
+  GLuint m_fixedFbo = 0;
+  GLuint m_fixedTexture = 0;
+  GLuint m_fixedRbo = 0;
 
   FISCHE* m_fische = nullptr;
   float m_aspect;
@@ -109,6 +116,9 @@ private:
   float m_texleft;
   bool m_filemode;
   int m_size;
+  int m_fixedWidth       = 0;
+  int m_fixedHeight      = 0;
+  bool m_fixedFboReady   = false;
   std::vector<uint8_t> m_axis;
 
 

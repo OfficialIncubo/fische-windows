@@ -143,6 +143,12 @@ AppSettings LoadSettings()
     settings.useFilePersistence = parse_bool(it->second, settings.useFilePersistence);
   if (auto it = values.find("spoutsenderenabled"); it != values.end())
     settings.spoutEnabled = parse_bool(it->second, settings.spoutEnabled);
+  if (auto it = values.find("fixedspoutenabled"); it != values.end())
+    settings.fixedSpoutEnabled = parse_bool(it->second, settings.fixedSpoutEnabled);
+  if (auto it = values.find("fixedspoutwidth"); it != values.end())
+    settings.fixedSpoutWidth = parse_int(it->second, settings.fixedSpoutWidth, 320, 7680);
+  if (auto it = values.find("fixedspoutheight"); it != values.end())
+    settings.fixedSpoutHeight = parse_int(it->second, settings.fixedSpoutHeight, 240, 4320);
   if (auto it = values.find("vsync"); it != values.end())
   {
     const std::string& v = lower(trim(it->second));
@@ -179,6 +185,9 @@ void SaveSettings(const AppSettings& settings)
   file << "NervousMode=" << (settings.nervousMode ? "true" : "false") << "\n";
   file << "UseFilePersistence=" << (settings.useFilePersistence ? "true" : "false") << "\n";
   file << "SpoutSenderEnabled=" << (settings.spoutEnabled ? "true" : "false") << "\n";
+  file << "FixedSpoutEnabled=" << (settings.fixedSpoutEnabled ? "true" : "false") << "\n";
+  file << "FixedSpoutWidth="   << settings.fixedSpoutWidth  << "\n";
+  file << "FixedSpoutHeight="  << settings.fixedSpoutHeight << "\n";
   file << "VSync=" << vsyncStr[std::clamp(settings.vsyncMode, 0, 2)] << "\n";
   file << "AlwaysOnTop=" << (settings.alwaysOnTop ? "true" : "false") << "\n";
   file << "WindowWidth=" << std::max(settings.windowWidth, 320) << "\n";

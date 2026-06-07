@@ -38,6 +38,7 @@ std::chrono::steady_clock::time_point g_osdUntil;
 std::chrono::steady_clock::time_point g_cursorUntil;
 bool g_cursorVisible = true;
 bool g_spoutReady = false;
+bool g_fixedSpoutEnabled = false;
 bool g_paused = false;
 bool g_openSettings = false;
 bool g_windowHidden = false;
@@ -144,6 +145,17 @@ void show_osd(const std::string& message, int milliseconds = 3000)
   g_osdTextH = sz.cy;
 }
 
+void apply_fixed_spout()
+{
+  if (!g_visualizer) return;
+  if (g_settings.fixedSpoutEnabled && g_settings.spoutEnabled)
+    g_visualizer->SetupFixedFbo(g_settings.fixedSpoutWidth, g_settings.fixedSpoutHeight);
+  else
+    g_visualizer->DestroyFixedFbo();
+
+    g_visualizer->m_useFixedSpout = g_settings.fixedSpoutEnabled && g_settings.spoutEnabled;
+}
+
 void update_spout_state()
 {
   if (g_settings.spoutEnabled)
@@ -166,6 +178,8 @@ void update_spout_state()
       g_spoutReady = false;
     }
   }
+
+  apply_fixed_spout();
 }
 
 void recreate_visualizer()
@@ -216,6 +230,7 @@ void recreate_visualizer()
     g_audioCapture.SetSensitivity(g_settings.audioSensitivity);
   }
   update_spout_state();
+  apply_fixed_spout();
   g_lastFramebufferWidth = framebufferWidth;
   g_lastFramebufferHeight = framebufferHeight;
 }
@@ -258,6 +273,7 @@ void apply_settings(const AppSettings& settings)
     hide_to_tray();
   else if (!g_settings.hideWindow && g_windowHidden)
     show_from_tray();
+  apply_fixed_spout();
   recreate_visualizer();
 }
 
@@ -316,14 +332,15 @@ void draw_help_screen(int fw, int fh)
     "Help - Keyboard/Mouse Shortcuts",
     "",
     "Esc            Exit",
-    "F1     Show / hide help screen",
-    "F/DLClick              Toggle fullscreen",
+    "F1             Show / hide help screen",
+    "F/DLClick      Toggle fullscreen",
     "T              Toggle always on top",
     "N              Toggle nervous mode",
     "S              Hide visual window",
     "O/RClick       Open settings",
     "P              Pause / unpause",
     "Z              Toggle Spout output",
+    "X              Toggle fixed Spout output",
     "R              Reset audio sensitivity",
     "Up             Increase audio sensitivity",
     "Down           Decrease audio sensitivity",
@@ -632,6 +649,14 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       update_spout_state();
       SaveSettings(g_settings);
       show_osd(g_settings.spoutEnabled ? "Spout output enabled" : "Spout output disabled");
+      break;
+    case GLFW_KEY_X:
+      g_settings.fixedSpoutEnabled = !g_settings.fixedSpoutEnabled;
+      apply_fixed_spout();
+      if (g_visualizer)
+        g_visualizer->m_useFixedSpout = g_settings.fixedSpoutEnabled && g_settings.spoutEnabled;
+      SaveSettings(g_settings);
+      show_osd(g_settings.fixedSpoutEnabled ? "Fixed Spout output on" : "Fixed Spout output off");
       break;
     case GLFW_KEY_R:
       g_settings.audioSensitivity = 1.0f;

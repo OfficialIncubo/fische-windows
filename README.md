@@ -107,6 +107,7 @@ On the first run, `settings.ini` is created next to the executable with default 
 | `O` (or `Right Click`) | Open settings dialog |
 | `P` | Pause / unpause |
 | `Z` | Toggle Spout output |
+| `X` | Toggle fixed Spout resolution |
 | `R` | Reset audio sensitivity |
 | `Up` | Increase audio sensitivity |
 | `Down` | Decrease audio sensitivity |
@@ -127,6 +128,9 @@ FPSLimit=60
 NervousMode=false
 UseFilePersistence=false
 SpoutSenderEnabled=false
+FixedSpoutEnabled=false
+FixedSpoutWidth=1080
+FixedSpoutHeight=1920
 VSync=Off
 AlwaysOnTop=false
 WindowWidth=1280
@@ -143,6 +147,8 @@ HideWindow=false
 | `NervousMode` | true / false | Rapid animation mode |
 | `UseFilePersistence` | true / false | Cache vector fields to `vectors/` folder |
 | `SpoutSenderEnabled` | true / false | Enable Spout texture sharing |
+| `FixedSpoutEnabled` | true / false | Render and send Spout output at a fixed resolution independent of the window size |
+| `FixedSpoutWidth` / `FixedSpoutHeight` | integer | Fixed Spout output resolution; only used when `FixedSpoutEnabled` is true |
 | `VSync` | Off / On / Adaptive | VSync mode; Adaptive mode uses `glfwSwapInterval(-1)`, which reduces tearing without hard locking the frame rate |
 | `AlwaysOnTop` | true / false | Keep the visual window above all other windows |
 | `WindowWidth` / `WindowHeight` | integer | Last window size; restored on next launch |
