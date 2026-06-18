@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <wininet.h>
 
 namespace
 {
@@ -56,6 +57,11 @@ constexpr UINT TRAY_CMD_EXIT     = 9003;
 constexpr UINT TRAY_CMD_PAUSE    = 9004;
 constexpr UINT TRAY_CMD_SPOUT    = 9005;
 constexpr UINT TRAY_CMD_NERVOUS  = 9006;
+
+// For update checker
+constexpr const char* kFischeVersion = "v2.3.1"; // Actual version of this visualizer
+std::string g_latestVersion;
+std::string g_pendingUpdateMessage;
 
 // Original WNDPROC for subclassing the GLFW window
 WNDPROC g_origWndProc = nullptr;
@@ -143,6 +149,42 @@ void show_osd(const std::string& message, int milliseconds = 3000)
   SelectObject(hdc, old);
   g_osdTextW = sz.cx;
   g_osdTextH = sz.cy;
+}
+
+void check_for_updates()
+{
+  std::thread([]() {
+    HINTERNET hInternet = InternetOpenW(L"fische-update-check", INTERNET_OPEN_TYPE_DIRECT, nullptr, nullptr, 0);
+    if (!hInternet) return;
+
+    HINTERNET hUrl = InternetOpenUrlW(hInternet,
+        L"https://api.github.com/repos/OfficialIncubo/fische-windows/releases/latest",
+        nullptr, 0, INTERNET_FLAG_RELOAD, 0);
+    if (!hUrl) { InternetCloseHandle(hInternet); return; }
+
+    char buffer[4096] = {};
+    DWORD bytesRead = 0;
+    InternetReadFile(hUrl, buffer, sizeof(buffer) - 1, &bytesRead);
+    std::string response(buffer, bytesRead);
+
+    InternetCloseHandle(hUrl);
+    InternetCloseHandle(hInternet);
+
+    // crude tag_name extraction, no JSON library needed
+    size_t pos = response.find("\"tag_name\"");
+    if (pos == std::string::npos) return;
+    pos = response.find('"', pos + 11);
+    if (pos == std::string::npos) return;
+    size_t end = response.find('"', pos + 1);
+    std::string latestTag = response.substr(pos + 1, end - pos - 1);
+
+    if (!latestTag.empty() && latestTag != kFischeVersion)
+    {
+      g_latestVersion = latestTag;
+      g_pendingUpdateMessage = "Update available: " + latestTag + "! Press U to get the latest release.";
+      //show_osd("Update available: " + latestTag + "! Press U to get the latest release.", 5000);
+    }
+  }).detach();
 }
 
 void apply_fixed_spout()
@@ -333,6 +375,7 @@ void draw_help_screen(int fw, int fh)
     "",
     "Esc            Exit",
     "F1             Show / hide help screen",
+    "U              Open latest release page (when update is available)",
     "F/DLClick      Toggle fullscreen",
     "T              Toggle always on top",
     "N              Toggle nervous mode",
@@ -356,6 +399,13 @@ void draw_help_screen(int fw, int fh)
     glCallLists(static_cast<GLsizei>(strlen(line)), GL_UNSIGNED_BYTE, line);
     y += 28;
   }
+
+  // after the for loop drawing lines[]:
+glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
+std::string footer = std::string("fische for Windows ") + kFischeVersion + " - github.com/OfficialIncubo/fische-windows";
+glRasterPos2f(60.0f, static_cast<float>(fh - 30));
+glListBase(g_fontBase - 32);
+glCallLists(static_cast<GLsizei>(footer.size()), GL_UNSIGNED_BYTE, footer.c_str());
 
   // Restore everything
   glMatrixMode(GL_MODELVIEW);
@@ -616,6 +666,11 @@ void key_callback(GLFWwindow* window, int key, int, int action, int)
       set_always_on_top(!g_alwaysOnTop);
       show_osd(g_alwaysOnTop ? "Always on top ON" : "Always on top OFF");
       break;
+    case GLFW_KEY_U:
+      if (!g_latestVersion.empty())
+        ShellExecuteW(nullptr, L"open", L"https://github.com/OfficialIncubo/fische-windows/releases/latest", nullptr, nullptr, SW_SHOWNORMAL);
+      else show_osd("No update available. You are using the latest version.");
+      break;
     case GLFW_KEY_S:
       hide_to_tray();
       break;
@@ -831,6 +886,7 @@ int main(int, char**)
   glPolygonMode(GL_FRONT, GL_FILL);
 
   recreate_visualizer();
+  check_for_updates();
 
   HWND hwnd = glfwGetWin32Window(g_window);
   HICON icon = (HICON)LoadImageW(GetModuleHandleW(nullptr),
@@ -872,6 +928,12 @@ int main(int, char**)
     {
       g_pendingApply = false;
       apply_settings(g_pendingSettings);
+    }
+
+    if (!g_pendingUpdateMessage.empty())
+    {
+      show_osd(g_pendingUpdateMessage, 5000);
+      g_pendingUpdateMessage.clear();
     }
 
     maybe_handle_resize();

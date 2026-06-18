@@ -102,6 +102,7 @@ target_link_libraries(fische PRIVATE
   dxgi
   d3dcompiler
   winmm
+  wininet
   user32
   gdi32
   comctl32

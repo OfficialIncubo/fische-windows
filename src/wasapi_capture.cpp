@@ -329,7 +329,7 @@ void WasapiCapture::ThreadMain(std::wstring preferredDeviceName)
   ComApartment com(COINIT_MULTITHREADED);
   if (FAILED(com.hr))
   {
-    FISHE_LOG_WARN("WASAPI COM initialization failed: 0x%08lx", com.hr);
+    //FISHE_LOG_WARN("WASAPI COM initialization failed: 0x%08lx", com.hr);
     m_running.store(false);
     return;
   }
@@ -337,11 +337,18 @@ void WasapiCapture::ThreadMain(std::wstring preferredDeviceName)
   while (!m_stop.load())
   {
     HRESULT hr = CaptureOnce(preferredDeviceName);
+
+    if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+    {
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      continue; // retry — will re-enumerate and reconnect
+    }
+
     if (m_stop.load())
       break;
 
-    FISHE_LOG_WARN("WASAPI capture stopped, retrying: 0x%08lx", hr);
-    std::this_thread::sleep_for(std::chrono::milliseconds(750));
+    //FISHE_LOG_WARN("WASAPI capture stopped, retrying: 0x%08lx", hr);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
   m_running.store(false);
@@ -442,6 +449,14 @@ long WasapiCapture::CaptureOnce(const std::wstring& preferredDeviceName)
       UINT32 frames = 0;
       DWORD flags = 0;
       hr = captureClient->GetBuffer(&data, &frames, &flags, nullptr, nullptr);
+
+
+      if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+      {
+        //FISHE_LOG_DEBUG("Audio device disconnected, will retry");
+        return hr;
+      }
+
       if (FAILED(hr))
         return hr;
 

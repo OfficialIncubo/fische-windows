@@ -100,6 +100,7 @@ On the first run, `settings.ini` is created next to the executable with default 
 |-----|--------|
 | `Esc` | Exit |
 | `F1` | Show / hide help screen |
+| `U` | Open latest release page (when update is available) |
 | `F` (or `Double Left Click`) | Toggle fullscreen |
 | `T` | Toggle always on top |
 | `N` | Toggle nervous mode |
